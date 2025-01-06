@@ -1,0 +1,77 @@
+@font-face {
+	font-family: roboto-regular;
+	src: url(fonts/Roboto-Regular.ttf);
+	font-style: normal;
+}
+
+@font-face {
+	font-family: roboto-bold;
+	src: url(fonts/Roboto-Bold.ttf);
+}
+
+@font-face {
+	font-family: roboto-light;
+	src: url(fonts/Roboto-Light.ttf);
+}
+
+@font-face {
+	font-family: roboto-medium;
+	src: url(fonts/Roboto-Medium.ttf);
+}
+
+@font-face {
+	font-family: pastrami;
+	src: url(fonts/Pastrami.ttf);
+}
+
+@font-face {
+	font-family: report-regular;
+	src: url(fonts/Report-Regular.ttf);
+}
+
+@font-face {
+	font-family: report-bold;
+	src: url(fonts/Report-Bold.ttf);
+}
+
+  
+
+html, body {margin: 0; height: 100%; overflow: hidden}
+body {
+    background:
+      radial-gradient(circle farthest-side at 0% 50%,#000000 23.5%,#0000 0)28.35px 40.5px,
+      radial-gradient(circle farthest-side at 0% 50%,#797979 24%,#0000 0)25.65px 40.5px,
+      linear-gradient(#000000 14%,#0000 0, #0000 85%,#000000 0)0 0,
+      linear-gradient(150deg,#000000 24%,#797979 0,#797979 26%,#0000 0,#0000 74%,#797979 0,#797979 76%,#000000 0)0 0,
+      linear-gradient(30deg,#000000 24%,#797979 0,#797979 26%,#0000 0,#0000 74%,#797979 0,#797979 76%,#000000 0)0 0,
+      linear-gradient(90deg,#797979 2%,#000000 0,#000000 98%,#797979 0%)0 0 #000000;
+    background-size: 54px 81px;
+    background-color: #000000;
+    margin: 0px;
+}
+
+.logoAnim {
+    width: 250px;
+    height: 250px;
+    border-radius: 50%;
+}
+
+.bigDiv {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    margin-top: 10%;
+}
+
+.text {
+    color: white;
+    font-family: report-regular;
+    font-size: 20px;
+    padding-left: 50px;
+    padding-right: 50px;
+    text-align: center;
+    background-color: #696969e1;
+    border-radius: 10px;
+    margin: 50px;
+}

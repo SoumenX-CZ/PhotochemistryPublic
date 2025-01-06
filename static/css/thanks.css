@@ -1,0 +1,421 @@
+@font-face {
+	font-family: roboto-regular;
+	src: url(fonts/Roboto-Regular.ttf);
+	font-style: normal;
+}
+
+@font-face {
+	font-family: roboto-bold;
+	src: url(fonts/Roboto-Bold.ttf);
+}
+
+@font-face {
+	font-family: roboto-light;
+	src: url(fonts/Roboto-Light.ttf);
+}
+
+@font-face {
+	font-family: roboto-medium;
+	src: url(fonts/Roboto-Medium.ttf);
+}
+
+@font-face {
+	font-family: pastrami;
+	src: url(fonts/Pastrami.ttf);
+}
+
+@font-face {
+	font-family: report-regular;
+	src: url(fonts/Report-Regular.ttf);
+}
+
+@font-face {
+	font-family: report-bold;
+	src: url(fonts/Report-Bold.ttf);
+}
+
+html, body {margin: 0; height: 100%; overflow: hidden}
+body {
+    background:
+      radial-gradient(circle farthest-side at 0% 50%,#000000 23.5%,#0000 0)28.35px 40.5px,
+      radial-gradient(circle farthest-side at 0% 50%,#797979 24%,#0000 0)25.65px 40.5px,
+      linear-gradient(#000000 14%,#0000 0, #0000 85%,#000000 0)0 0,
+      linear-gradient(150deg,#000000 24%,#797979 0,#797979 26%,#0000 0,#0000 74%,#797979 0,#797979 76%,#000000 0)0 0,
+      linear-gradient(30deg,#000000 24%,#797979 0,#797979 26%,#0000 0,#0000 74%,#797979 0,#797979 76%,#000000 0)0 0,
+      linear-gradient(90deg,#797979 2%,#000000 0,#000000 98%,#797979 0%)0 0 #000000;
+    background-size: 54px 81px;
+    background-color: #000000;
+    margin: 0px;
+}
+
+.logoAnim {
+    width: 250px;
+    height: 250px;
+    border-radius: 50%;
+}
+
+.bigDiv {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    margin-top: 10%;
+}
+
+.btnBig {
+	background-color: white;
+	border-radius: 30px;
+	width: 300px;
+	height: 60px;
+	text-align: center;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	box-shadow: 0px 0px 73px 0px #757575;
+	margin-top: 30px;
+	border: 6px transparent solid;
+}
+
+.btnBigOutline {
+	background-color: transparent;
+	border: 6px white solid;
+	border-radius: 30px;
+	width: 300px;
+	height: 60px;
+	text-align: center;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	margin-top: 30px;
+	animation: installBtn 0.6s ease 0s infinite normal forwards;
+}
+
+.btnBigOutline button {
+	color: white;
+	text-decoration: none;
+	font-family: pastrami;
+	font-size: 40px;
+	background-color: transparent;
+	border: none;
+}
+
+.btnBig a {
+	color: black;
+	text-decoration: none;
+	font-family: pastrami;
+	font-size: 40px;
+}
+
+.elipseTop {
+	background-color: black;
+	padding: 15px;
+	height: 60px;
+	border-radius: 50% 50% 0px 0px;
+	border-top: 20px solid white;
+}
+
+.elipseBottom {
+	background-color: black;
+	padding: 15px;
+	height: 60px;
+	border-radius: 0px 0px 50% 50%;
+	margin-bottom: -5px;
+	border-bottom: 20px solid white;
+}
+
+#mainGrid {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+}
+
+#mainGridFull {
+	display: flex;
+    justify-content: center;
+    align-items: center;
+}
+#mainGridFull img {
+	padding-right: 40px;
+}
+
+#bottomHead {
+	flex-direction: column;
+	align-items: center;
+	justify-content: flex-start;
+	margin-top: -80px;
+	margin-bottom: -80px;
+}
+.flexCenter {
+	display: flex;
+	justify-content: center;
+}
+
+.bottomPart{
+	background-color: black;
+	padding: 15px;
+	margin-bottom: -50px;
+}
+
+#headline {
+	color: white;
+	font-family: pastrami;
+	font-size: 60px;
+}
+
+#headlineBig {
+	color: white;
+	font-family: pastrami;
+	font-size: 80px;
+}
+
+#logo {
+	margin: 30px;
+}
+
+#aboutAppDiv {
+	color: black;
+	font-family: report-regular;
+	font-size: 18px;
+	background-color: white;
+	box-shadow: 0px 15px 27px 0px #a9a9a9 inset;
+	border-radius: 15px;
+	padding: 20px;
+	margin: 50px;
+	text-align:justify;
+	margin-bottom: 30px;
+}
+
+#aboutAppDiv p {
+	margin: 0px;
+    display: block;
+    font-size: 25px;
+}
+
+#btnBar {
+	margin:50px;
+	display: flex;
+    flex-direction: row;
+}
+
+#btnBar div {
+	margin-right: 20px;
+}
+
+#previewImg img{
+	width: 100%;
+}
+
+#previewImg {
+	display: flex;
+	margin-right: 130px;
+    margin-left: 130px;
+    margin-top: 130px;
+}
+
+#bigTxt {
+	font-family: pastrami;
+	font-size: 30px;
+	padding-top: 50px;
+}
+
+#line {
+	background-color: rgb(206, 206, 206);
+    height: 2px;
+    width: 98%;
+    border-radius: 20px;
+    margin-top: 5px;
+    margin-bottom: 8px;
+}
+
+@keyframes installBtn {
+	0% {
+		transform: scale(1);
+	}
+
+	50% {
+		transform: scale(1.04);
+	}
+
+	100% {
+		transform: scale(1);
+	}
+}
+
+#btnStart {
+	display: none;
+}
+  
+@media screen and (max-width: 980px) and (pointer: coarse){
+    html, body {margin: 0; height: 100%; overflow: scroll}
+    body {
+        background:
+            radial-gradient(circle farthest-side at 0% 50%,#000000 23.5%,#0000 0)33.6px 48px,
+            radial-gradient(circle farthest-side at 0% 50%,#797979 24%,#0000 0)30.4px 48px,
+            linear-gradient(#000000 14%,#0000 0, #0000 85%,#000000 0)0 0,
+            linear-gradient(150deg,#000000 24%,#797979 0,#797979 26%,#0000 0,#0000 74%,#797979 0,#797979 76%,#000000 0)0 0,
+            linear-gradient(30deg,#000000 24%,#797979 0,#797979 26%,#0000 0,#0000 74%,#797979 0,#797979 76%,#000000 0)0 0,
+            linear-gradient(90deg,#797979 2%,#000000 0,#000000 98%,#797979 0%)0 0 #000000;
+        background-size: 64px 96px;
+        background-color: #000000;
+    }
+
+	.bigDiv {
+		display: flex;
+		align-items: center;
+        justify-content: center;
+		flex-direction: column;
+		margin-top: 30%;
+	}
+
+	#bigTxt {
+        font-size: 90px;
+        text-align: center;
+        width: 100%;
+        display: block;
+        padding-top: 0px;
+	}
+
+	.bigDiv img {
+		border-radius: 50%;
+	}
+
+	.btnBig a {
+		color: black;
+		text-decoration: none;
+		font-family: pastrami;
+		font-size: 60px;
+	}
+
+	.btnBig {
+		background-color: white;
+		border-radius: 30px;
+		width: 50%;
+		height: 60px;
+		text-align: center;
+		display: flex;
+		align-items: center;
+        justify-content: center;
+		padding: 20px;
+		box-shadow: 0px 0px 73px 0px #757575;
+	}
+
+	.btnBigOutline {
+		background-color: transparent;
+		border: 6px white solid;
+		border-radius: 30px;
+		width: 50%;
+		height: 60px;
+		text-align: center;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		margin-top: 30px;
+		padding: 20px;
+	}
+	
+	.btnBigOutline button {
+		color: white;
+		text-decoration: none;
+		font-family: pastrami;
+		font-size: 60px;
+	}
+
+	#line {
+		height: 5px;
+		margin-top: 15px;
+		margin-bottom: 15px;
+	}
+
+	.logoAnim {
+		width: 300px;
+		height: 300px;
+	}
+	#mainGrid {
+		display: grid;
+		grid-template-columns: 1fr;
+	}
+
+	#aboutAppDiv{
+		margin-bottom: -20px;
+	}
+
+    #aboutAppDiv p {
+        font-size: 20px;
+        text-align: center;
+    }
+
+    #aboutAppDiv li {
+        font-size: 20px;
+        margin-top: 30px;
+        margin-left: 0px;
+        list-style-type: none;
+        text-align: center;
+    }
+	#previewImg {
+		display: flex;
+		margin-right: 0px;
+		margin-left: 0px;
+		margin-top: 0px;
+	}
+	#aboutAppDiv {
+		font-size: 13px;
+		padding: 40px;
+	}
+
+	#btnBar {
+		display: flex;
+		justify-content: center;
+    	align-items: center;
+	}
+
+	#mainGridFull {
+		margin-top: 20px;
+		margin-bottom: 40px;
+	}
+}
+
+@media screen and (min-width:768px) and (pointer: coarse){
+	html, body {margin: 0; height: 100%; overflow: scroll}
+	#previewImg {
+		display: flex;
+		margin-right: 20px;
+		margin-left: 20px;
+		margin-top: 90px;
+	}
+	#headline {
+		color: white;
+		font-family: pastrami;
+		font-size: 40px;
+	}
+	
+	#headlineBig {
+		color: white;
+		font-family: pastrami;
+		font-size: 60px;
+	}
+	#bottomHead {
+		margin-bottom: -120px;
+	}
+
+	.elipseBottom {
+		margin-top: -80px;
+	}
+
+	#aboutAppDiv {
+		font-size: 13px;
+	}
+	.btnBig {
+		width: auto;
+		padding-right: 20px;
+		padding-left: 20px;
+	}
+	.btnBigOutline {
+		width: auto;
+		padding-left: 20px;
+		padding-right: 20px;
+		white-space: nowrap;
+	}
+	#mainGridFull {
+		margin-top: 20px;
+		margin-bottom: 40px;
+	}
+}

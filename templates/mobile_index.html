@@ -1,0 +1,2558 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Photochemistry</title>
+    <meta name="viewport" content="maximum-scale=1.0, user-scalable=0">
+    <meta name="google-site-verification" content="RQaPpbf8SdwiqzUFZg0-9qgYAPf53gtBnWbSz9nxk64" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.0/socket.io.js'></script>
+    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js" integrity="sha384-2huaZvOR9iDzHqslqwpR87isEmrfxqyWOF7hr7BY6KG0+hVKLoEXMPUJw3ynWuhO" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.css" integrity="sha512-087vysR/jM0N5cp13Vlp+ZF9wx6tKbvJLwPO8Iit6J7R+n7uIMMjg37dEgexOshDmDITHYY5useeSmfD1MYiQA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.js" integrity="sha512-lR8d1BXfYQuiqoM/LeGFVtxFyspzWFTZNyYIiE5O2CcAGtTCRRUMLloxATRuLz8EmR2fYqdXYlrGh+D6TVGp3g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdn.jsdelivr.net/npm/party-js@latest/bundle/party.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/mobile_main.css') }}">
+</head>
+
+<body>
+    <div id="overlay">
+        <div class="flexCenter">
+            <div class="loader">
+                <div class="slice"></div>
+                <div class="slice"></div>
+                <div class="slice"></div>
+                <div class="slice"></div>
+                <div class="slice"></div>
+                <div class="slice"></div>
+            </div> 
+        </div>
+    </div>
+
+    <div id="flashMessage">
+        <div class="flexCenter" id="flashMessageDiv">
+            <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="black" class="bi bi-bell" viewBox="0 0 16 16" style="padding-left:80px;">
+                <path d="M8 16a2 2 0 0 0 2-2H6a2 2 0 0 0 2 2M8 1.918l-.797.161A4 4 0 0 0 4 6c0 .628-.134 2.197-.459 3.742-.16.767-.376 1.566-.663 2.258h10.244c-.287-.692-.502-1.49-.663-2.258C12.134 8.197 12 6.628 12 6a4 4 0 0 0-3.203-3.92zM14.22 12c.223.447.481.801.78 1H1c.299-.199.557-.553.78-1C2.68 10.2 3 6.88 3 6c0-2.42 1.72-4.44 4.005-4.901a1 1 0 1 1 1.99 0A5 5 0 0 1 13 6c0 .88.32 4.2 1.22 6"/>
+              </svg>
+            <span id="flashMessageText">Žádný obrázek nenalezen</span>
+        </div>
+    </div>
+
+    <div id="disclaimerAccept">
+        <div class="flexCenter" id="disclaimerAcceptDiv">
+              <p>
+                <svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" fill="black" class="bi bi-exclamation-triangle" viewBox="0 0 16 16">
+                    <path d="M7.938 2.016A.13.13 0 0 1 8.002 2a.13.13 0 0 1 .063.016.15.15 0 0 1 .054.057l6.857 11.667c.036.06.035.124.002.183a.2.2 0 0 1-.054.06.1.1 0 0 1-.066.017H1.146a.1.1 0 0 1-.066-.017.2.2 0 0 1-.054-.06.18.18 0 0 1 .002-.183L7.884 2.073a.15.15 0 0 1 .054-.057m1.044-.45a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767z"/>
+                    <path d="M7.002 12a1 1 0 1 1 2 0 1 1 0 0 1-2 0M7.1 5.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0z"/>
+                  </svg>
+                <span style="font-family: pastrami; font-size: 80px;">UPOZORNĚNÍ</span>
+                
+                <br>
+                Tato aplikace využívá umělou inteligenci pro rozpoznávání a analýzu chemických vzorců a rovnic. Přestože se snažíme poskytovat co nejpřesnější informace, nelze zaručit, že všechny výsledky jsou 100% správné. Doporučujeme ověřit veškeré výpočty a informace před jejich použitím.
+                <br><br>Kliknutím na tlačítko „Přijmout“ potvrzujete, že jste si vědomi možných nepřesností.
+              </p>
+              <button id="acceptDisclaimerBtn" onclick="acceptDisclaimer()">PŘÍJMOUT</button>
+        </div>
+    </div>
+
+    <svg width="0" height="0" style="display: none;">
+        <defs>
+          <filter id="red-only">
+            <feComponentTransfer>
+              <feFuncR type="table" tableValues="1 1" />
+              <feFuncG type="table" tableValues="0 1" />
+              <feFuncB type="table" tableValues="0 1" />
+            </feComponentTransfer>
+          </filter>
+        </defs>
+    </svg>
+
+    
+    <div id="reload">
+        <div>
+            <button onclick="chemBotOpen()" id="btnChemBot"><svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" fill="black" class="bi bi-robot" viewBox="0 0 16 16">
+                <path d="M6 12.5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 0 1h-3a.5.5 0 0 1-.5-.5M3 8.062C3 6.76 4.235 5.765 5.53 5.886a26.6 26.6 0 0 0 4.94 0C11.765 5.765 13 6.76 13 8.062v1.157a.93.93 0 0 1-.765.935c-.845.147-2.34.346-4.235.346s-3.39-.2-4.235-.346A.93.93 0 0 1 3 9.219zm4.542-.827a.25.25 0 0 0-.217.068l-.92.9a25 25 0 0 1-1.871-.183.25.25 0 0 0-.068.495c.55.076 1.232.149 2.02.193a.25.25 0 0 0 .189-.071l.754-.736.847 1.71a.25.25 0 0 0 .404.062l.932-.97a25 25 0 0 0 1.922-.188.25.25 0 0 0-.068-.495c-.538.074-1.207.145-1.98.189a.25.25 0 0 0-.166.076l-.754.785-.842-1.7a.25.25 0 0 0-.182-.135"/>
+                <path d="M8.5 1.866a1 1 0 1 0-1 0V3h-2A4.5 4.5 0 0 0 1 7.5V8a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1v1a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-1a1 1 0 0 0 1-1V9a1 1 0 0 0-1-1v-.5A4.5 4.5 0 0 0 10.5 3h-2zM14 7.5V13a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V7.5A3.5 3.5 0 0 1 5.5 4h5A3.5 3.5 0 0 1 14 7.5"/>
+            </svg></button>
+            <button onclick="reloadVideo()" id="btnReload"><svg xmlns="http://www.w3.org/2000/svg" width="120" height="120" fill="black" class="bi bi-arrow-clockwise" viewBox="0 0 16 16">
+                <path fill-rule="evenodd" d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2z"/>
+                <path d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466"/>
+            </svg></button>
+        </div>
+    </div>
+
+    <div id="feedback">
+        <div class="flexCenter"><span id="feedbackMessage">Pomohla ti tato informace?</span></div>
+        
+        <div id="likes">
+            <button onclick="likeSend()" id="likeBtn">
+                <svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" fill="white" class="bi bi-hand-thumbs-up" viewBox="0 0 16 16">
+                    <path d="M8.864.046C7.908-.193 7.02.53 6.956 1.466c-.072 1.051-.23 2.016-.428 2.59-.125.36-.479 1.013-1.04 1.639-.557.623-1.282 1.178-2.131 1.41C2.685 7.288 2 7.87 2 8.72v4.001c0 .845.682 1.464 1.448 1.545 1.07.114 1.564.415 2.068.723l.048.03c.272.165.578.348.97.484.397.136.861.217 1.466.217h3.5c.937 0 1.599-.477 1.934-1.064a1.86 1.86 0 0 0 .254-.912c0-.152-.023-.312-.077-.464.201-.263.38-.578.488-.901.11-.33.172-.762.004-1.149.069-.13.12-.269.159-.403.077-.27.113-.568.113-.857 0-.288-.036-.585-.113-.856a2 2 0 0 0-.138-.362 1.9 1.9 0 0 0 .234-1.734c-.206-.592-.682-1.1-1.2-1.272-.847-.282-1.803-.276-2.516-.211a10 10 0 0 0-.443.05 9.4 9.4 0 0 0-.062-4.509A1.38 1.38 0 0 0 9.125.111zM11.5 14.721H8c-.51 0-.863-.069-1.14-.164-.281-.097-.506-.228-.776-.393l-.04-.024c-.555-.339-1.198-.731-2.49-.868-.333-.036-.554-.29-.554-.55V8.72c0-.254.226-.543.62-.65 1.095-.3 1.977-.996 2.614-1.708.635-.71 1.064-1.475 1.238-1.978.243-.7.407-1.768.482-2.85.025-.362.36-.594.667-.518l.262.066c.16.04.258.143.288.255a8.34 8.34 0 0 1-.145 4.725.5.5 0 0 0 .595.644l.003-.001.014-.003.058-.014a9 9 0 0 1 1.036-.157c.663-.06 1.457-.054 2.11.164.175.058.45.3.57.65.107.308.087.67-.266 1.022l-.353.353.353.354c.043.043.105.141.154.315.048.167.075.37.075.581 0 .212-.027.414-.075.582-.05.174-.111.272-.154.315l-.353.353.353.354c.047.047.109.177.005.488a2.2 2.2 0 0 1-.505.805l-.353.353.353.354c.006.005.041.05.041.17a.9.9 0 0 1-.121.416c-.165.288-.503.56-1.066.56z"/>
+                  </svg>
+                <span>Ano</span>
+            </button>
+
+            <button onclick="dislikeSend()" id="dislikeBtn">
+                <svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" fill="white" class="bi bi-hand-thumbs-down" viewBox="0 0 16 16">
+                    <path d="M8.864 15.674c-.956.24-1.843-.484-1.908-1.42-.072-1.05-.23-2.015-.428-2.59-.125-.36-.479-1.012-1.04-1.638-.557-.624-1.282-1.179-2.131-1.41C2.685 8.432 2 7.85 2 7V3c0-.845.682-1.464 1.448-1.546 1.07-.113 1.564-.415 2.068-.723l.048-.029c.272-.166.578-.349.97-.484C6.931.08 7.395 0 8 0h3.5c.937 0 1.599.478 1.934 1.064.164.287.254.607.254.913 0 .152-.023.312-.077.464.201.262.38.577.488.9.11.33.172.762.004 1.15.069.13.12.268.159.403.077.27.113.567.113.856s-.036.586-.113.856c-.035.12-.08.244-.138.363.394.571.418 1.2.234 1.733-.206.592-.682 1.1-1.2 1.272-.847.283-1.803.276-2.516.211a10 10 0 0 1-.443-.05 9.36 9.36 0 0 1-.062 4.51c-.138.508-.55.848-1.012.964zM11.5 1H8c-.51 0-.863.068-1.14.163-.281.097-.506.229-.776.393l-.04.025c-.555.338-1.198.73-2.49.868-.333.035-.554.29-.554.55V7c0 .255.226.543.62.65 1.095.3 1.977.997 2.614 1.709.635.71 1.064 1.475 1.238 1.977.243.7.407 1.768.482 2.85.025.362.36.595.667.518l.262-.065c.16-.04.258-.144.288-.255a8.34 8.34 0 0 0-.145-4.726.5.5 0 0 1 .595-.643h.003l.014.004.058.013a9 9 0 0 0 1.036.157c.663.06 1.457.054 2.11-.163.175-.059.45-.301.57-.651.107-.308.087-.67-.266-1.021L12.793 7l.353-.354c.043-.042.105-.14.154-.315.048-.167.075-.37.075-.581s-.027-.414-.075-.581c-.05-.174-.111-.273-.154-.315l-.353-.354.353-.354c.047-.047.109-.176.005-.488a2.2 2.2 0 0 0-.505-.804l-.353-.354.353-.354c.006-.005.041-.05.041-.17a.9.9 0 0 0-.121-.415C12.4 1.272 12.063 1 11.5 1"/>
+                  </svg>
+                <span>Ne</span>
+            </button>
+            <button id="thanksBtn" style="display: none;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" fill="white" class="bi bi-hearts" viewBox="0 0 16 16">
+                    <path fill-rule="evenodd" d="M4.931.481c1.627-1.671 5.692 1.254 0 5.015-5.692-3.76-1.626-6.686 0-5.015m6.84 1.794c1.084-1.114 3.795.836 0 3.343-3.795-2.507-1.084-4.457 0-3.343M7.84 7.642c2.71-2.786 9.486 2.09 0 8.358-9.487-6.268-2.71-11.144 0-8.358"/>
+                  </svg>
+                <span>Moc děkujeme za zpětnou vazbu!</span>
+            </button>
+        </div>
+        
+    </div>
+    
+
+    <div id="moreInfo">
+        <div class="flexCenter" id="moreInfoY">
+            <div class="designDivPop" id="moreInfoDiv">
+                <div class="basicData">
+                    <span id="bigTxt">VLASTNOSTI</span><button class="closeBtn" id="moreInfoCB" onclick="closeMoreInfo()"><svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" fill="white" class="bi bi-x-lg" viewBox="0 0 16 16">
+                        <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z"/>
+                      </svg></button>
+                    <div id="line" class="flexCenter"></div>
+                </div>
+                <div class="basicData">
+                    <div class="flexCenterDots">
+                        <div class="iconAndText">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="white" class="bi bi-card-text" viewBox="0 0 16 16">
+                                <path d="M14.5 3a.5.5 0 0 1 .5.5v9a.5.5 0 0 1-.5.5h-13a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 .5-.5zm-13-1A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 14.5 2z"/>
+                                <path d="M3 5.5a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5M3 8a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9A.5.5 0 0 1 3 8m0 2.5a.5.5 0 0 1 .5-.5h6a.5.5 0 0 1 0 1h-6a.5.5 0 0 1-.5-.5"/>
+                              </svg>
+                            <span style="white-space: nowrap; padding-right: 10px;" class="boldTxt">Další názvy: </span> 
+                        </div>
+                        <span id="molMoreNamesMI"></span>
+                        <div class="containerDots" id="moreInfoDotsNames">
+                            <div class="cube"><div class="cube__inner"></div></div>
+                            <div class="cube"><div class="cube__inner"></div></div>
+                            <div class="cube"><div class="cube__inner"></div></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="basicData">
+                    <div class="flexCenterDots">
+                        <div class="iconAndText">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="white" class="bi bi-piggy-bank" viewBox="0 0 16 16">
+                                <path d="M5 6.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0m1.138-1.496A6.6 6.6 0 0 1 7.964 4.5c.666 0 1.303.097 1.893.273a.5.5 0 0 0 .286-.958A7.6 7.6 0 0 0 7.964 3.5c-.734 0-1.441.103-2.102.292a.5.5 0 1 0 .276.962"/>
+                                <path fill-rule="evenodd" d="M7.964 1.527c-2.977 0-5.571 1.704-6.32 4.125h-.55A1 1 0 0 0 .11 6.824l.254 1.46a1.5 1.5 0 0 0 1.478 1.243h.263c.3.513.688.978 1.145 1.382l-.729 2.477a.5.5 0 0 0 .48.641h2a.5.5 0 0 0 .471-.332l.482-1.351c.635.173 1.31.267 2.011.267.707 0 1.388-.095 2.028-.272l.543 1.372a.5.5 0 0 0 .465.316h2a.5.5 0 0 0 .478-.645l-.761-2.506C13.81 9.895 14.5 8.559 14.5 7.069q0-.218-.02-.431c.261-.11.508-.266.705-.444.315.306.815.306.815-.417 0 .223-.5.223-.461-.026a1 1 0 0 0 .09-.255.7.7 0 0 0-.202-.645.58.58 0 0 0-.707-.098.74.74 0 0 0-.375.562c-.024.243.082.48.32.654a2 2 0 0 1-.259.153c-.534-2.664-3.284-4.595-6.442-4.595M2.516 6.26c.455-2.066 2.667-3.733 5.448-3.733 3.146 0 5.536 2.114 5.536 4.542 0 1.254-.624 2.41-1.67 3.248a.5.5 0 0 0-.165.535l.66 2.175h-.985l-.59-1.487a.5.5 0 0 0-.629-.288c-.661.23-1.39.359-2.157.359a6.6 6.6 0 0 1-2.157-.359.5.5 0 0 0-.635.304l-.525 1.471h-.979l.633-2.15a.5.5 0 0 0-.17-.534 4.65 4.65 0 0 1-1.284-1.541.5.5 0 0 0-.446-.275h-.56a.5.5 0 0 1-.492-.414l-.254-1.46h.933a.5.5 0 0 0 .488-.393m12.621-.857a.6.6 0 0 1-.098.21l-.044-.025c-.146-.09-.157-.175-.152-.223a.24.24 0 0 1 .117-.173c.049-.027.08-.021.113.012a.2.2 0 0 1 .064.199"/>
+                            </svg>
+                            <span style="white-space: nowrap; padding-right: 10px" class="boldTxt">Molekulární hmotnost: </span> 
+                        </div>
+                        <span id="molWeightMI"></span>
+                        <div class="containerDots moreInfoDots">
+                            <div class="cube"><div class="cube__inner"></div></div>
+                            <div class="cube"><div class="cube__inner"></div></div>
+                            <div class="cube"><div class="cube__inner"></div></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="basicData">
+                    <div class="flexCenterDots">
+                        <div class="iconAndText">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="white" class="bi bi-three-dots-vertical" viewBox="0 0 16 16">
+                                <path d="M9.5 13a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0m0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0m0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0"/>
+                            </svg>
+                            <span style="white-space: nowrap; padding-right: 10px" class="boldTxt">Počet atomů: </span> 
+                        </div>    
+                        <span id="molNumAtomsMI"></span>
+                        
+                        <div class="containerDots moreInfoDots">
+                            <div class="cube"><div class="cube__inner"></div></div>
+                            <div class="cube"><div class="cube__inner"></div></div>
+                            <div class="cube"><div class="cube__inner"></div></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="basicData">
+                    <div class="flexCenterDots">
+                        <div class="iconAndText">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="white" class="bi bi-octagon" viewBox="0 0 16 16">
+                                <path d="M4.54.146A.5.5 0 0 1 4.893 0h6.214a.5.5 0 0 1 .353.146l4.394 4.394a.5.5 0 0 1 .146.353v6.214a.5.5 0 0 1-.146.353l-4.394 4.394a.5.5 0 0 1-.353.146H4.893a.5.5 0 0 1-.353-.146L.146 11.46A.5.5 0 0 1 0 11.107V4.893a.5.5 0 0 1 .146-.353zM5.1 1 1 5.1v5.8L5.1 15h5.8l4.1-4.1V5.1L10.9 1z"/>
+                            </svg>
+                            <span style="white-space: nowrap; padding-right: 10px" class="boldTxt">Počet cyklů: </span> 
+                        </div>
+                        <span id="molNumRingsMI"></span>
+                        <div class="containerDots moreInfoDots">
+                            <div class="cube"><div class="cube__inner"></div></div>
+                            <div class="cube"><div class="cube__inner"></div></div>
+                            <div class="cube"><div class="cube__inner"></div></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="basicData">
+                    <div class="flexCenterDots">
+                        <div class="iconAndText">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="white" class="bi bi-fire" viewBox="0 0 16 16">
+                                <path d="M8 16c3.314 0 6-2 6-5.5 0-1.5-.5-4-2.5-6 .25 1.5-1.25 2-1.25 2C11 4 9 .5 6 0c.357 2 .5 4-2 6-1.25 1-2 2.729-2 4.5C2 14 4.686 16 8 16m0-1c-1.657 0-3-1-3-2.75 0-.75.25-2 1.25-3C6.125 10 7 10.5 7 10.5c-.375-1.25.5-3.25 2-3.5-.179 1-.25 2 1 3 .625.5 1 1.364 1 2.25C11 14 9.657 15 8 15"/>
+                            </svg>
+                            <span style="white-space: nowrap; padding-right: 10px" class="boldTxt">Bod varu: </span> 
+                        </div>
+                        <span id="molBoilingPointMI" ></span>
+                        <div class="containerDots moreInfoDots">
+                            <div class="cube"><div class="cube__inner"></div></div>
+                            <div class="cube"><div class="cube__inner"></div></div>
+                            <div class="cube"><div class="cube__inner"></div></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="basicData">
+                    <div class="flexCenterDots">
+                        <div class="iconAndText">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="white" class="bi bi-snow" viewBox="0 0 16 16">
+                                <path d="M8 16a.5.5 0 0 1-.5-.5v-1.293l-.646.647a.5.5 0 0 1-.707-.708L7.5 12.793V8.866l-3.4 1.963-.496 1.85a.5.5 0 1 1-.966-.26l.237-.882-1.12.646a.5.5 0 0 1-.5-.866l1.12-.646-.884-.237a.5.5 0 1 1 .26-.966l1.848.495L7 8 3.6 6.037l-1.85.495a.5.5 0 0 1-.258-.966l.883-.237-1.12-.646a.5.5 0 1 1 .5-.866l1.12.646-.237-.883a.5.5 0 1 1 .966-.258l.495 1.849L7.5 7.134V3.207L6.147 1.854a.5.5 0 1 1 .707-.708l.646.647V.5a.5.5 0 1 1 1 0v1.293l.647-.647a.5.5 0 1 1 .707.708L8.5 3.207v3.927l3.4-1.963.496-1.85a.5.5 0 1 1 .966.26l-.236.882 1.12-.646a.5.5 0 0 1 .5.866l-1.12.646.883.237a.5.5 0 1 1-.26.966l-1.848-.495L9 8l3.4 1.963 1.849-.495a.5.5 0 0 1 .259.966l-.883.237 1.12.646a.5.5 0 0 1-.5.866l-1.12-.646.236.883a.5.5 0 1 1-.966.258l-.495-1.849-3.4-1.963v3.927l1.353 1.353a.5.5 0 0 1-.707.708l-.647-.647V15.5a.5.5 0 0 1-.5.5z"/>
+                            </svg>
+                            <span style="white-space: nowrap; padding-right: 10px" class="boldTxt">Bod mrazu: </span> 
+                        </div>
+                        <span id="molMeltingPointMI" ></span>
+                        <div class="containerDots moreInfoDots">
+                            <div class="cube"><div class="cube__inner"></div></div>
+                            <div class="cube"><div class="cube__inner"></div></div>
+                            <div class="cube"><div class="cube__inner"></div></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="basicData">
+                    <div class="flexCenterDots">
+                        <div class="iconAndText">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="white" class="bi bi-pen" viewBox="0 0 16 16">
+                                <path d="m13.498.795.149-.149a1.207 1.207 0 1 1 1.707 1.708l-.149.148a1.5 1.5 0 0 1-.059 2.059L4.854 14.854a.5.5 0 0 1-.233.131l-4 1a.5.5 0 0 1-.606-.606l1-4a.5.5 0 0 1 .131-.232l9.642-9.642a.5.5 0 0 0-.642.056L6.854 4.854a.5.5 0 1 1-.708-.708L9.44.854A1.5 1.5 0 0 1 11.5.796a1.5 1.5 0 0 1 1.998-.001m-.644.766a.5.5 0 0 0-.707 0L1.95 11.756l-.764 3.057 3.057-.764L14.44 3.854a.5.5 0 0 0 0-.708z"/>
+                            </svg>
+                            <span style="white-space: nowrap; padding-right: 10px" class="boldTxt">Popis: </span> 
+                        </div>    
+                        <span id="molDescriptionMI"></span>
+                        <div class="containerDots moreInfoDots">
+                            <div class="cube"><div class="cube__inner"></div></div>
+                            <div class="cube"><div class="cube__inner"></div></div>
+                            <div class="cube"><div class="cube__inner"></div></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="basicData">
+                    <div class="flexCenter">
+                        <div class="containerDots" id="moreSafetyDots">
+                            <div class="cube"><div class="cube__inner"></div></div>
+                            <div class="cube"><div class="cube__inner"></div></div>
+                            <div class="cube"><div class="cube__inner"></div></div>
+                        </div>
+                    </div>
+                    <div id="moreSafetyDiv" class="flexSafety"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="moreInfoSearch">
+        <div class="flexCenter" id="moreInfoSearchY" style="filter: invert(1);">
+            <div class="designDivPop" id="moreInfoSearchDiv">
+                <div class="basicData">
+                    <span id="bigTxt">VLASTNOSTI</span><button class="closeBtn" id="moreInfoSearchCB" onclick="closeMoreInfoSearch()"><svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" fill="white" class="bi bi-x-lg" viewBox="0 0 16 16">
+                        <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z"/>
+                      </svg></button>
+                    <div id="line" class="flexCenter"></div>
+                </div>
+                <div class="basicData flexCenter" id="moreImagesDiv">
+                    <img id="molImageS" style="
+                    -webkit-filter: invert(1);
+                    filter: invert(1);
+                    object-fit: contain;
+                    width: 300px;" src="{{ url_for('static', filename='images/unknown.jpg') }}">
+                    <button id="moreImagesBtn" onclick="moreImages()"><svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" fill="white" class="bi bi-caret-right" viewBox="0 0 16 16">
+                        <path d="M6 12.796V3.204L11.481 8zm.659.753 5.48-4.796a1 1 0 0 0 0-1.506L6.66 2.451C6.011 1.885 5 2.345 5 3.204v9.592a1 1 0 0 0 1.659.753"/>
+                      </svg></button>
+                </div>
+                
+                <div class="basicData textCenter">
+                    <span id="molNameS"></span>
+                    <div class="flexCenter">
+                        <div class="containerDots moreInfoDotsS">
+                            <div class="cube"><div class="cube__inner"></div></div>
+                            <div class="cube"><div class="cube__inner"></div></div>
+                            <div class="cube"><div class="cube__inner"></div></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="basicData textCenter">
+                    <span id="molMoreNamesS"></span>
+                    <div class="flexCenter">
+                        <div class="containerDots" id="moreNamesDotsS">
+                            <div class="cube"><div class="cube__inner"></div></div>
+                            <div class="cube"><div class="cube__inner"></div></div>
+                            <div class="cube"><div class="cube__inner"></div></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="basicData">
+                    <div class="flexCenterDots">
+                        <div class="iconAndText">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="white" class="bi bi-piggy-bank" viewBox="0 0 16 16">
+                                <path d="M5 6.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0m1.138-1.496A6.6 6.6 0 0 1 7.964 4.5c.666 0 1.303.097 1.893.273a.5.5 0 0 0 .286-.958A7.6 7.6 0 0 0 7.964 3.5c-.734 0-1.441.103-2.102.292a.5.5 0 1 0 .276.962"/>
+                                <path fill-rule="evenodd" d="M7.964 1.527c-2.977 0-5.571 1.704-6.32 4.125h-.55A1 1 0 0 0 .11 6.824l.254 1.46a1.5 1.5 0 0 0 1.478 1.243h.263c.3.513.688.978 1.145 1.382l-.729 2.477a.5.5 0 0 0 .48.641h2a.5.5 0 0 0 .471-.332l.482-1.351c.635.173 1.31.267 2.011.267.707 0 1.388-.095 2.028-.272l.543 1.372a.5.5 0 0 0 .465.316h2a.5.5 0 0 0 .478-.645l-.761-2.506C13.81 9.895 14.5 8.559 14.5 7.069q0-.218-.02-.431c.261-.11.508-.266.705-.444.315.306.815.306.815-.417 0 .223-.5.223-.461-.026a1 1 0 0 0 .09-.255.7.7 0 0 0-.202-.645.58.58 0 0 0-.707-.098.74.74 0 0 0-.375.562c-.024.243.082.48.32.654a2 2 0 0 1-.259.153c-.534-2.664-3.284-4.595-6.442-4.595M2.516 6.26c.455-2.066 2.667-3.733 5.448-3.733 3.146 0 5.536 2.114 5.536 4.542 0 1.254-.624 2.41-1.67 3.248a.5.5 0 0 0-.165.535l.66 2.175h-.985l-.59-1.487a.5.5 0 0 0-.629-.288c-.661.23-1.39.359-2.157.359a6.6 6.6 0 0 1-2.157-.359.5.5 0 0 0-.635.304l-.525 1.471h-.979l.633-2.15a.5.5 0 0 0-.17-.534 4.65 4.65 0 0 1-1.284-1.541.5.5 0 0 0-.446-.275h-.56a.5.5 0 0 1-.492-.414l-.254-1.46h.933a.5.5 0 0 0 .488-.393m12.621-.857a.6.6 0 0 1-.098.21l-.044-.025c-.146-.09-.157-.175-.152-.223a.24.24 0 0 1 .117-.173c.049-.027.08-.021.113.012a.2.2 0 0 1 .064.199"/>
+                            </svg>
+                            <span style="white-space: nowrap; padding-right: 10px; filter: invert(1); color: black;" class="boldTxt"> Molekulární hmotnost: </span> 
+                        </div>
+                        <span id="molWeightS" ></span>
+                        <div class="containerDots moreInfoDotsS">
+                                <div class="cube"><div class="cube__inner"></div></div>
+                                <div class="cube"><div class="cube__inner"></div></div>
+                                <div class="cube"><div class="cube__inner"></div></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="basicData">
+                    <div class="flexCenterDots">
+                        <div class="iconAndText">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="white" class="bi bi-three-dots-vertical" viewBox="0 0 16 16">
+                                <path d="M9.5 13a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0m0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0m0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0"/>
+                            </svg>
+                            <span style="white-space: nowrap; padding-right: 10px; filter: invert(1); color: black;" class="boldTxt"> Počet atomů: </span> 
+                        </div>    
+                        <span id="molNumAtomsS" ></span>
+                        <div class="containerDots moreInfoDotsS">
+                            <div class="cube"><div class="cube__inner"></div></div>
+                            <div class="cube"><div class="cube__inner"></div></div>
+                            <div class="cube"><div class="cube__inner"></div></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="basicData">
+                    <div class="flexCenterDots">
+                        <div class="iconAndText">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="white" class="bi bi-octagon" viewBox="0 0 16 16">
+                                <path d="M4.54.146A.5.5 0 0 1 4.893 0h6.214a.5.5 0 0 1 .353.146l4.394 4.394a.5.5 0 0 1 .146.353v6.214a.5.5 0 0 1-.146.353l-4.394 4.394a.5.5 0 0 1-.353.146H4.893a.5.5 0 0 1-.353-.146L.146 11.46A.5.5 0 0 1 0 11.107V4.893a.5.5 0 0 1 .146-.353zM5.1 1 1 5.1v5.8L5.1 15h5.8l4.1-4.1V5.1L10.9 1z"/>
+                            </svg>
+                            <span style="white-space: nowrap; padding-right: 10px; filter: invert(1); color: black;" class="boldTxt"> Počet cyklů: </span> 
+                        </div>
+                        <span id="molNumRingsS" ></span>
+                        <div class="containerDots moreInfoDotsS">
+                            <div class="cube"><div class="cube__inner"></div></div>
+                            <div class="cube"><div class="cube__inner"></div></div>
+                            <div class="cube"><div class="cube__inner"></div></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="basicData">
+                    <div class="flexCenterDots">
+                        <div class="iconAndText">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="white" class="bi bi-fire" viewBox="0 0 16 16">
+                                <path d="M8 16c3.314 0 6-2 6-5.5 0-1.5-.5-4-2.5-6 .25 1.5-1.25 2-1.25 2C11 4 9 .5 6 0c.357 2 .5 4-2 6-1.25 1-2 2.729-2 4.5C2 14 4.686 16 8 16m0-1c-1.657 0-3-1-3-2.75 0-.75.25-2 1.25-3C6.125 10 7 10.5 7 10.5c-.375-1.25.5-3.25 2-3.5-.179 1-.25 2 1 3 .625.5 1 1.364 1 2.25C11 14 9.657 15 8 15"/>
+                            </svg>
+                            <span style="white-space: nowrap; padding-right: 10px; filter: invert(1); color: black;" class="boldTxt"> Bod varu: </span> 
+                        </div>
+                        <span id="molBoilingPointS" ></span>
+                        <div class="containerDots moreInfoDotsS">
+                            <div class="cube"><div class="cube__inner"></div></div>
+                            <div class="cube"><div class="cube__inner"></div></div>
+                            <div class="cube"><div class="cube__inner"></div></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="basicData">
+                    <div class="flexCenterDots">
+                        <div class="iconAndText">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="white" class="bi bi-snow" viewBox="0 0 16 16">
+                                <path d="M8 16a.5.5 0 0 1-.5-.5v-1.293l-.646.647a.5.5 0 0 1-.707-.708L7.5 12.793V8.866l-3.4 1.963-.496 1.85a.5.5 0 1 1-.966-.26l.237-.882-1.12.646a.5.5 0 0 1-.5-.866l1.12-.646-.884-.237a.5.5 0 1 1 .26-.966l1.848.495L7 8 3.6 6.037l-1.85.495a.5.5 0 0 1-.258-.966l.883-.237-1.12-.646a.5.5 0 1 1 .5-.866l1.12.646-.237-.883a.5.5 0 1 1 .966-.258l.495 1.849L7.5 7.134V3.207L6.147 1.854a.5.5 0 1 1 .707-.708l.646.647V.5a.5.5 0 1 1 1 0v1.293l.647-.647a.5.5 0 1 1 .707.708L8.5 3.207v3.927l3.4-1.963.496-1.85a.5.5 0 1 1 .966.26l-.236.882 1.12-.646a.5.5 0 0 1 .5.866l-1.12.646.883.237a.5.5 0 1 1-.26.966l-1.848-.495L9 8l3.4 1.963 1.849-.495a.5.5 0 0 1 .259.966l-.883.237 1.12.646a.5.5 0 0 1-.5.866l-1.12-.646.236.883a.5.5 0 1 1-.966.258l-.495-1.849-3.4-1.963v3.927l1.353 1.353a.5.5 0 0 1-.707.708l-.647-.647V15.5a.5.5 0 0 1-.5.5z"/>
+                            </svg>
+                            <span style="white-space: nowrap; padding-right: 10px; filter: invert(1); color: black;" class="boldTxt"> Bod mrazu: </span> 
+                        </div>    
+                        <span id="molMeltingPointS" ></span>
+                        <div class="containerDots moreInfoDotsS">
+                            <div class="cube"><div class="cube__inner"></div></div>
+                            <div class="cube"><div class="cube__inner"></div></div>
+                            <div class="cube"><div class="cube__inner"></div></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="basicData molPeriodicInfoDiv">
+                    <div class="flexCenterDots">
+                        <div class="iconAndText">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="white" class="bi bi-123" viewBox="0 0 16 16">
+                                <path d="M2.873 11.297V4.142H1.699L0 5.379v1.137l1.64-1.18h.06v5.961zm3.213-5.09v-.063c0-.618.44-1.169 1.196-1.169.676 0 1.174.44 1.174 1.106 0 .624-.42 1.101-.807 1.526L4.99 10.553v.744h4.78v-.99H6.643v-.069L8.41 8.252c.65-.724 1.237-1.332 1.237-2.27C9.646 4.849 8.723 4 7.308 4c-1.573 0-2.36 1.064-2.36 2.15v.057zm6.559 1.883h.786c.823 0 1.374.481 1.379 1.179.01.707-.55 1.216-1.421 1.21-.77-.005-1.326-.419-1.379-.953h-1.095c.042 1.053.938 1.918 2.464 1.918 1.478 0 2.642-.839 2.62-2.144-.02-1.143-.922-1.651-1.551-1.714v-.063c.535-.09 1.347-.66 1.326-1.678-.026-1.053-.933-1.855-2.359-1.845-1.5.005-2.317.88-2.348 1.898h1.116c.032-.498.498-.944 1.206-.944.703 0 1.206.435 1.206 1.07.005.64-.504 1.106-1.2 1.106h-.75z"/>
+                            </svg>
+                            <span style="white-space: nowrap; padding-right: 10px; filter: invert(1); color: black;" class="boldTxt"> Atomové číslo: </span> 
+                        </div>
+                        <span id="molAtomNumberS"></span>
+                    </div>
+                </div>
+
+                <div class="basicData molPeriodicInfoDiv">
+                    <div class="flexCenterDots">
+                        <div class="iconAndText">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="white" class="bi bi-tools" viewBox="0 0 16 16">
+                                <path d="M1 0 0 1l2.2 3.081a1 1 0 0 0 .815.419h.07a1 1 0 0 1 .708.293l2.675 2.675-2.617 2.654A3.003 3.003 0 0 0 0 13a3 3 0 1 0 5.878-.851l2.654-2.617.968.968-.305.914a1 1 0 0 0 .242 1.023l3.27 3.27a.997.997 0 0 0 1.414 0l1.586-1.586a.997.997 0 0 0 0-1.414l-3.27-3.27a1 1 0 0 0-1.023-.242L10.5 9.5l-.96-.96 2.68-2.643A3.005 3.005 0 0 0 16 3q0-.405-.102-.777l-2.14 2.141L12 4l-.364-1.757L13.777.102a3 3 0 0 0-3.675 3.68L7.462 6.46 4.793 3.793a1 1 0 0 1-.293-.707v-.071a1 1 0 0 0-.419-.814zm9.646 10.646a.5.5 0 0 1 .708 0l2.914 2.915a.5.5 0 0 1-.707.707l-2.915-2.914a.5.5 0 0 1 0-.708M3 11l.471.242.529.026.287.445.445.287.026.529L5 13l-.242.471-.026.529-.445.287-.287.445-.529.026L3 15l-.471-.242L2 14.732l-.287-.445L1.268 14l-.026-.529L1 13l.242-.471.026-.529.445-.287.287-.445.529-.026z"/>
+                            </svg>
+                            <span style="white-space: nowrap; padding-right: 10px; filter: invert(1); color: black;" class="boldTxt"> Elektro. konfigurace: </span> 
+                        </div>
+                        <span id="molElectronConfigS"></span>
+                    </div>
+                </div>
+
+                <div class="basicData">
+                    <div class="flexCenterDots">
+                        <div class="iconAndText">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="white" class="bi bi-pen" viewBox="0 0 16 16">
+                                <path d="m13.498.795.149-.149a1.207 1.207 0 1 1 1.707 1.708l-.149.148a1.5 1.5 0 0 1-.059 2.059L4.854 14.854a.5.5 0 0 1-.233.131l-4 1a.5.5 0 0 1-.606-.606l1-4a.5.5 0 0 1 .131-.232l9.642-9.642a.5.5 0 0 0-.642.056L6.854 4.854a.5.5 0 1 1-.708-.708L9.44.854A1.5 1.5 0 0 1 11.5.796a1.5 1.5 0 0 1 1.998-.001m-.644.766a.5.5 0 0 0-.707 0L1.95 11.756l-.764 3.057 3.057-.764L14.44 3.854a.5.5 0 0 0 0-.708z"/>
+                            </svg>
+                            <span style="white-space: nowrap; padding-right: 10px; filter: invert(1); color: black;" class="boldTxt"> Popis: </span> 
+                        </div>
+                        <span id="molDescriptionS"></span>
+                        <div class="containerDots moreInfoDotsS">
+                            <div class="cube"><div class="cube__inner"></div></div>
+                            <div class="cube"><div class="cube__inner"></div></div>
+                            <div class="cube"><div class="cube__inner"></div></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="basicData">
+                    <div class="flexCenter">
+                        <div class="containerDots" id="moreSafetyDotsS">
+                            <div class="cube"><div class="cube__inner"></div></div>
+                            <div class="cube"><div class="cube__inner"></div></div>
+                            <div class="cube"><div class="cube__inner"></div></div>
+                        </div>
+                    </div>
+                    <div id="moreSafetyDivS" class="flexSafety"></div>
+                </div>
+                
+                <div class="basicData">
+                    <span id="bigTxt">VYUŽITÍ</span>
+                    <div id="line" class="flexCenter"></div>
+                </div>
+                <div class="basicData">
+                    <div class="flexCenter">
+                        <div class="containerDots" id="usesDotsS">
+                            <div class="cube"><div class="cube__inner"></div></div>
+                            <div class="cube"><div class="cube__inner"></div></div>
+                            <div class="cube"><div class="cube__inner"></div></div>
+                        </div>
+                    </div>
+                    <div id="usesS" style="-webkit-text-size-adjust: 100%"></div>
+                </div>
+
+                <div class="basicData" id="noReaction">
+                    <span id="bigTxt">REAKCE</span><svg id="paidFeatureLockMIS" class="closeBtn" xmlns="http://www.w3.org/2000/svg" width="60" height="60" fill="white" class="bi bi-lock" viewBox="0 0 16 16">
+                        <path d="M8 1a2 2 0 0 1 2 2v4H6V3a2 2 0 0 1 2-2m3 6V3a3 3 0 0 0-6 0v4a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2M5 8h6a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1"/>
+                      </svg>
+                    <div id="line" class="flexCenter"></div>
+                </div>
+                
+                <div class="basicData reactionMoreDiv">
+                    <button id="reaction1Btn"><span id="reaction1"></span>
+                        <div class="containerDots reactionDots">
+                            <div class="cube"><div class="cube__inner"></div></div>
+                            <div class="cube"><div class="cube__inner"></div></div>
+                            <div class="cube"><div class="cube__inner"></div></div>
+                        </div>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" fill="white" class="bi bi-arrow-right-short" viewBox="0 0 16 16">
+                        <path fill-rule="evenodd" d="M4 8a.5.5 0 0 1 .5-.5h5.793L8.146 5.354a.5.5 0 1 1 .708-.708l3 3a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708-.708L10.293 8.5H4.5A.5.5 0 0 1 4 8"/>
+                      </svg></button>
+                </div>
+                <div class="basicData reactionMoreDiv">
+                    <button id="reaction2Btn"><span id="reaction2"></span>
+                        <div class="containerDots reactionDots">
+                            <div class="cube"><div class="cube__inner"></div></div>
+                            <div class="cube"><div class="cube__inner"></div></div>
+                            <div class="cube"><div class="cube__inner"></div></div>
+                        </div>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" fill="white" class="bi bi-arrow-right-short" viewBox="0 0 16 16">
+                        <path fill-rule="evenodd" d="M4 8a.5.5 0 0 1 .5-.5h5.793L8.146 5.354a.5.5 0 1 1 .708-.708l3 3a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708-.708L10.293 8.5H4.5A.5.5 0 0 1 4 8"/>
+                      </svg></button>
+                </div>
+                <div class="basicData reactionMoreDiv">
+                    <button id="reaction3Btn"><span id="reaction3"></span>
+                        <div class="containerDots reactionDots">
+                            <div class="cube"><div class="cube__inner"></div></div>
+                            <div class="cube"><div class="cube__inner"></div></div>
+                            <div class="cube"><div class="cube__inner"></div></div>
+                        </div>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" fill="white" class="bi bi-arrow-right-short" viewBox="0 0 16 16">
+                        <path fill-rule="evenodd" d="M4 8a.5.5 0 0 1 .5-.5h5.793L8.146 5.354a.5.5 0 1 1 .708-.708l3 3a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708-.708L10.293 8.5H4.5A.5.5 0 0 1 4 8"/>
+                      </svg></button>
+                </div>
+
+                <div id="paidFeatureMIS" class="basicData textCenter paidSection">
+                    <button style="color: white;" class="paidButton" onclick="paypalOpen()">
+                        <svg style="animation: woobleBottom 2s ease 0s infinite normal forwards;" xmlns="http://www.w3.org/2000/svg" width="60" height="60" fill="white" class="bi bi-cash-coin" viewBox="0 0 16 16">
+                            <path fill-rule="evenodd" d="M11 15a4 4 0 1 0 0-8 4 4 0 0 0 0 8m5-4a5 5 0 1 1-10 0 5 5 0 0 1 10 0"/>
+                            <path d="M9.438 11.944c.047.596.518 1.06 1.363 1.116v.44h.375v-.443c.875-.061 1.386-.529 1.386-1.207 0-.618-.39-.936-1.09-1.1l-.296-.07v-1.2c.376.043.614.248.671.532h.658c-.047-.575-.54-1.024-1.329-1.073V8.5h-.375v.45c-.747.073-1.255.522-1.255 1.158 0 .562.378.92 1.007 1.066l.248.061v1.272c-.384-.058-.639-.27-.696-.563h-.668zm1.36-1.354c-.369-.085-.569-.26-.569-.522 0-.294.216-.514.572-.578v1.1zm.432.746c.449.104.655.272.655.569 0 .339-.257.571-.709.614v-1.195z"/>
+                            <path d="M1 0a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h4.083q.088-.517.258-1H3a2 2 0 0 0-2-2V3a2 2 0 0 0 2-2h10a2 2 0 0 0 2 2v3.528c.38.34.717.728 1 1.154V1a1 1 0 0 0-1-1z"/>
+                            <path d="M9.998 5.083 10 5a2 2 0 1 0-3.132 1.65 6 6 0 0 1 3.13-1.567"/>
+                        </svg> <br>
+                        PODPOŘTE NÁS <br> a získejte přístup k prémiovým funkcím!
+                        <p id="payPalS"><svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="white" class="bi bi-paypal" viewBox="0 0 16 16">
+                            <path d="M14.06 3.713c.12-1.071-.093-1.832-.702-2.526C12.628.356 11.312 0 9.626 0H4.734a.7.7 0 0 0-.691.59L2.005 13.509a.42.42 0 0 0 .415.486h2.756l-.202 1.28a.628.628 0 0 0 .62.726H8.14c.429 0 .793-.31.862-.731l.025-.13.48-3.043.03-.164.001-.007a.35.35 0 0 1 .348-.297h.38c1.266 0 2.425-.256 3.345-.91q.57-.403.993-1.005a4.94 4.94 0 0 0 .88-2.195c.242-1.246.13-2.356-.57-3.154a2.7 2.7 0 0 0-.76-.59l-.094-.061ZM6.543 8.82a.7.7 0 0 1 .321-.079H8.3c2.82 0 5.027-1.144 5.672-4.456l.003-.016q.326.186.548.438c.546.623.679 1.535.45 2.71-.272 1.397-.866 2.307-1.663 2.874-.802.57-1.842.815-3.043.815h-.38a.87.87 0 0 0-.863.734l-.03.164-.48 3.043-.024.13-.001.004a.35.35 0 0 1-.348.296H5.595a.106.106 0 0 1-.105-.123l.208-1.32z"/>
+                          </svg>PayPal</p>
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    
+    <div id="moreInfoSearchReaction">
+        <div class="flexCenter" id="moreInfoSearchYR">
+            <div class="designDivPop" id="moreInfoSearchDivR">
+                <div class="basicData">
+                    <span id="bigTxt">REAKCE</span><button class="closeBtn" id="moreInfoSearchReactionCB" onclick="closeMoreInfoSearchReaction()"><svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" fill="white" class="bi bi-x-lg" viewBox="0 0 16 16">
+                        <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z"/>
+                      </svg></button>
+                    <div id="line" class="flexCenter"></div>
+                </div>
+                <div class="basicData" id="moreReactionSearch">
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <div id="chemBot" style="display: none;">
+        <div class="flexCenter" style="filter: invert(1);">
+            <div class="designDivPop" id="chemBotDiv">
+                <div class="basicData">
+                    <span id="bigTxt">ChemBot</span><button class="closeBtn" onclick="closeChemBot()"><svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" fill="white" class="bi bi-x-lg" viewBox="0 0 16 16">
+                        <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z"/>
+                      </svg></button>
+                    <div id="line" class="flexCenter"></div>
+                </div>
+                <div class="basicData">
+                    <div id="chemBotChatDiv">
+                        <svg id="chemBotLoader" xmlns="http://www.w3.org/2000/svg" width="200" height="200" fill="white" class="bi bi-robot" viewBox="0 0 16 16">
+                            <path d="M6 12.5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 0 1h-3a.5.5 0 0 1-.5-.5M3 8.062C3 6.76 4.235 5.765 5.53 5.886a26.6 26.6 0 0 0 4.94 0C11.765 5.765 13 6.76 13 8.062v1.157a.93.93 0 0 1-.765.935c-.845.147-2.34.346-4.235.346s-3.39-.2-4.235-.346A.93.93 0 0 1 3 9.219zm4.542-.827a.25.25 0 0 0-.217.068l-.92.9a25 25 0 0 1-1.871-.183.25.25 0 0 0-.068.495c.55.076 1.232.149 2.02.193a.25.25 0 0 0 .189-.071l.754-.736.847 1.71a.25.25 0 0 0 .404.062l.932-.97a25 25 0 0 0 1.922-.188.25.25 0 0 0-.068-.495c-.538.074-1.207.145-1.98.189a.25.25 0 0 0-.166.076l-.754.785-.842-1.7a.25.25 0 0 0-.182-.135"/>
+                            <path d="M8.5 1.866a1 1 0 1 0-1 0V3h-2A4.5 4.5 0 0 0 1 7.5V8a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1v1a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-1a1 1 0 0 0 1-1V9a1 1 0 0 0-1-1v-.5A4.5 4.5 0 0 0 10.5 3h-2zM14 7.5V13a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V7.5A3.5 3.5 0 0 1 5.5 4h5A3.5 3.5 0 0 1 14 7.5"/>
+                          </svg>
+                        <p id="chemBotMessage" style="text-align: center; font-size: 30px;">Ahoj já jsem ChemBot. Zeptej se mě na jakoukoliv chemickou otázku.</p>
+                        <div id="chemBotDots" style="display: none;">
+                            <div class="containerDots">
+                                <div class="cube"><div class="cube__inner"></div></div>
+                                <div class="cube"><div class="cube__inner"></div></div>
+                                <div class="cube"><div class="cube__inner"></div></div>
+                            </div>
+                        </div>
+                        <div id="chemBotGPT"></div>
+                    </div>
+                    
+                    <div id="chemBotInputDiv">
+                        <input class="searchInput" placeholder="Kolik atomů ..." type="text" id="chemBotInput">
+                        <button id="sendChemBotBtn" onclick="sendChemBot()"><svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" fill="white" class="bi bi-send" viewBox="0 0 16 16">
+                            <path d="M15.854.146a.5.5 0 0 1 .11.54l-5.819 14.547a.75.75 0 0 1-1.329.124l-3.178-4.995L.643 7.184a.75.75 0 0 1 .124-1.33L15.314.037a.5.5 0 0 1 .54.11ZM6.636 10.07l2.761 4.338L14.13 2.576zm6.787-8.201L1.591 6.602l4.339 2.76z"/>
+                          </svg></button>
+                    </div>
+
+                    <div id="chemBotReloadDiv" style="display: none;">
+                        <button onclick="chemBotReset()"><svg xmlns="http://www.w3.org/2000/svg" width="23" height="23" fill="white" class="bi bi-question-circle" viewBox="0 0 16 16">
+                            <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
+                            <path d="M5.255 5.786a.237.237 0 0 0 .241.247h.825c.138 0 .248-.113.266-.25.09-.656.54-1.134 1.342-1.134.686 0 1.314.343 1.314 1.168 0 .635-.374.927-.965 1.371-.673.489-1.206 1.06-1.168 1.987l.003.217a.25.25 0 0 0 .25.246h.811a.25.25 0 0 0 .25-.25v-.105c0-.718.273-.927 1.01-1.486.609-.463 1.244-.977 1.244-2.056 0-1.511-1.276-2.241-2.673-2.241-1.267 0-2.655.59-2.75 2.286m1.557 5.763c0 .533.425.927 1.01.927.609 0 1.028-.394 1.028-.927 0-.552-.42-.94-1.029-.94-.584 0-1.009.388-1.009.94"/>
+                          </svg> Nová otázka</button>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <div id="reactionDescInfo">
+        <div class="flexCenter" id="reactionDescInfoY">
+            <div class="designDivPop" id="reactionDescInfoDiv">
+                <div class="basicData">
+                    <span id="bigTxt">POSTUP VYČÍSLENÍ</span><button class="closeBtn" onclick="closeReactionDescInfo()" id="reactionDescInfoCB"><svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" fill="white" class="bi bi-x-lg" viewBox="0 0 16 16">
+                        <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z"/>
+                      </svg></button>
+                    <div id="line" class="flexCenter"></div>
+                </div>
+                <div class="basicData">
+                    <p id="reactionDescData" style="white-space: pre-wrap; -webkit-text-size-adjust: 100%"></p>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <div id="startup">
+        <div class="flexCenter" id="startupDiv">
+            <img class="logoAnim" src="{{ url_for('static', filename='images/logo.png') }}">
+            <div>VERZE 1.0</div>
+        </div>
+        <div id="poweredBy">
+            <span>Powered by</span>
+            <div>
+                <img style="-webkit-filter: invert(1);filter: invert(1); width: 150px; padding-bottom: 3px;" src="{{ url_for('static', filename='images/OpenAILogo.png') }}">
+                <img style="-webkit-filter: invert(1);filter: invert(1); width: 150px;" src="{{ url_for('static', filename='images/HerokuLogo.jpg') }}">
+                <img style="-webkit-filter: invert(1);filter: invert(1); width: 150px; padding-bottom: 2px;" src="{{ url_for('static', filename='images/PythonLogo.jpg') }}">
+                <img style="-webkit-filter: invert(1);filter: invert(1); height: 40px;" src="{{ url_for('static', filename='images/FlaskLogo.png') }}">
+            </div>
+        </div>
+    </div>
+
+    <video autoplay playsinline id="videoElement"></video>
+    <div id="canvasDiv" class="displayNone">
+        <canvas id="canvas" class="displayNone"></canvas>
+    </div>
+    
+    
+    <div class="bottomBar1 flexCenter" id="bottomBar1">
+        <div class="btnBar">
+            <div>
+                <button class="imageBtn" id="searchBtn" onclick="search()"><svg xmlns="http://www.w3.org/2000/svg" width="150" height="150" fill="black" class="bi bi-search" viewBox="0 0 16 16">
+                    <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0"/>
+                  </svg></button>
+                  <button class="imageBtn displayNone" id="reloadBtn" onclick="location.reload()"><svg xmlns="http://www.w3.org/2000/svg" width="150" height="150" fill="black" class="bi bi-arrow-clockwise" viewBox="0 0 16 16">
+                    <path fill-rule="evenodd" d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2z"/>
+                    <path d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466"/>
+                  </svg></button>
+            </div>
+            <div>
+                <button class="imageBtn displayNone" onclick="scan()" id="acceptBtn"><svg xmlns="http://www.w3.org/2000/svg" width="150" height="150" fill="black" class="bi bi-check-lg" viewBox="0 0 16 16">
+                    <path d="M12.736 3.97a.733.733 0 0 1 1.047 0c.286.289.29.756.01 1.05L7.88 12.01a.733.733 0 0 1-1.065.02L3.217 8.384a.757.757 0 0 1 0-1.06.733.733 0 0 1 1.047 0l3.052 3.093 5.4-6.425z"/>
+                  </svg></button>
+                <button onclick="takePhoto()" id="takePhotoBtn"></button>
+            </div>
+            <div>
+                <button onclick="paypalOpen()" class="imageBtn"><svg xmlns="http://www.w3.org/2000/svg" width="150" height="150" fill="black" class="bi bi-paypal" viewBox="0 0 16 16">
+                    <path d="M14.06 3.713c.12-1.071-.093-1.832-.702-2.526C12.628.356 11.312 0 9.626 0H4.734a.7.7 0 0 0-.691.59L2.005 13.509a.42.42 0 0 0 .415.486h2.756l-.202 1.28a.628.628 0 0 0 .62.726H8.14c.429 0 .793-.31.862-.731l.025-.13.48-3.043.03-.164.001-.007a.35.35 0 0 1 .348-.297h.38c1.266 0 2.425-.256 3.345-.91q.57-.403.993-1.005a4.94 4.94 0 0 0 .88-2.195c.242-1.246.13-2.356-.57-3.154a2.7 2.7 0 0 0-.76-.59l-.094-.061ZM6.543 8.82a.7.7 0 0 1 .321-.079H8.3c2.82 0 5.027-1.144 5.672-4.456l.003-.016q.326.186.548.438c.546.623.679 1.535.45 2.71-.272 1.397-.866 2.307-1.663 2.874-.802.57-1.842.815-3.043.815h-.38a.87.87 0 0 0-.863.734l-.03.164-.48 3.043-.024.13-.001.004a.35.35 0 0 1-.348.296H5.595a.106.106 0 0 1-.105-.123l.208-1.32z"/>
+                  </svg></button>
+            </div>  
+        </div>
+    </div>
+
+    <div class="bottomBar2" id="bottomBar2">
+        <div class="elipseTop"></div>
+        <div class="bottomPart" id="windowHeight">
+            <div class="flexCenter" id="bottomHead">
+                <div>
+                    <span id="headlineBig">P</span><span id="headline">HOTO</span><span id="headlineBig">C</span><span id="headline">HEMISTRY</span>
+                </div>
+                <div id="controlLine"></div>
+
+            </div>
+            
+            <div class="elipseBottom"></div>
+
+            <div id="dataDiv">
+                <div id="compoundDiv" class="displayNone">
+                    <div class="designDiv">
+                        <div class="basicData">
+                            <span id="bigTxt">VZOREC</span>
+                            <div id="line" class="flexCenter"></div>
+                        </div>
+                        
+                        <div class="basicData flexCenter" id="moreImagesDivTP">
+                            <img id="molImage" style="object-fit: contain;">
+                            <button id="moreImagesBtnTP" onclick="moreImagesTP()"><svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" fill="black" class="bi bi-caret-right" viewBox="0 0 16 16">
+                                <path d="M6 12.796V3.204L11.481 8zm.659.753 5.48-4.796a1 1 0 0 0 0-1.506L6.66 2.451C6.011 1.885 5 2.345 5 3.204v9.592a1 1 0 0 0 1.659.753"/>
+                              </svg></button>
+                        </div>
+                        <div class="basicData textCenter">
+                            <span id="molName"></span>
+                        </div>
+                        <div class="basicData textCenter">
+                            <span id="molNameMoreTP"></span>
+                            <div class="flexCenter">
+                                <div class="containerDotsB" id="moreNamesDotsTP">
+                                    <div class="cube"><div class="cube__inner"></div></div>
+                                    <div class="cube"><div class="cube__inner"></div></div>
+                                    <div class="cube"><div class="cube__inner"></div></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="designDiv">
+                        <div class="basicData">
+                            <span id="bigTxt">VLASTNOSTI</span>
+                            <div id="line" class="flexCenter"></div>
+                        </div>
+                        <div class="basicData">
+                            <div class="flexCenterDots">
+                                <div class="iconAndText">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="black" class="bi bi-piggy-bank" viewBox="0 0 16 16">
+                                        <path d="M5 6.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0m1.138-1.496A6.6 6.6 0 0 1 7.964 4.5c.666 0 1.303.097 1.893.273a.5.5 0 0 0 .286-.958A7.6 7.6 0 0 0 7.964 3.5c-.734 0-1.441.103-2.102.292a.5.5 0 1 0 .276.962"/>
+                                        <path fill-rule="evenodd" d="M7.964 1.527c-2.977 0-5.571 1.704-6.32 4.125h-.55A1 1 0 0 0 .11 6.824l.254 1.46a1.5 1.5 0 0 0 1.478 1.243h.263c.3.513.688.978 1.145 1.382l-.729 2.477a.5.5 0 0 0 .48.641h2a.5.5 0 0 0 .471-.332l.482-1.351c.635.173 1.31.267 2.011.267.707 0 1.388-.095 2.028-.272l.543 1.372a.5.5 0 0 0 .465.316h2a.5.5 0 0 0 .478-.645l-.761-2.506C13.81 9.895 14.5 8.559 14.5 7.069q0-.218-.02-.431c.261-.11.508-.266.705-.444.315.306.815.306.815-.417 0 .223-.5.223-.461-.026a1 1 0 0 0 .09-.255.7.7 0 0 0-.202-.645.58.58 0 0 0-.707-.098.74.74 0 0 0-.375.562c-.024.243.082.48.32.654a2 2 0 0 1-.259.153c-.534-2.664-3.284-4.595-6.442-4.595M2.516 6.26c.455-2.066 2.667-3.733 5.448-3.733 3.146 0 5.536 2.114 5.536 4.542 0 1.254-.624 2.41-1.67 3.248a.5.5 0 0 0-.165.535l.66 2.175h-.985l-.59-1.487a.5.5 0 0 0-.629-.288c-.661.23-1.39.359-2.157.359a6.6 6.6 0 0 1-2.157-.359.5.5 0 0 0-.635.304l-.525 1.471h-.979l.633-2.15a.5.5 0 0 0-.17-.534 4.65 4.65 0 0 1-1.284-1.541.5.5 0 0 0-.446-.275h-.56a.5.5 0 0 1-.492-.414l-.254-1.46h.933a.5.5 0 0 0 .488-.393m12.621-.857a.6.6 0 0 1-.098.21l-.044-.025c-.146-.09-.157-.175-.152-.223a.24.24 0 0 1 .117-.173c.049-.027.08-.021.113.012a.2.2 0 0 1 .064.199"/>
+                                    </svg>
+                                    <span style="white-space: nowrap; padding-right: 10px;"> Molekulární hmotnost: </span>
+                                </div>
+                                <span id="molWeight"></span>
+                            </div>
+                        </div>
+                        <div class="basicData">
+                            <div class="flexCenterDots">
+                                <div class="iconAndText">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="black" class="bi bi-three-dots-vertical" viewBox="0 0 16 16">
+                                        <path d="M9.5 13a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0m0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0m0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0"/>
+                                    </svg>
+                                    <span style="white-space: nowrap; padding-right: 10px;"> Počet atomů: </span>
+                                </div>
+                                <span id="molNumAtoms"></span>
+                            </div>
+                        </div>
+                        <div class="basicData">
+                            <div class="flexCenterDots">
+                                <div class="iconAndText">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="black" class="bi bi-octagon" viewBox="0 0 16 16">
+                                        <path d="M4.54.146A.5.5 0 0 1 4.893 0h6.214a.5.5 0 0 1 .353.146l4.394 4.394a.5.5 0 0 1 .146.353v6.214a.5.5 0 0 1-.146.353l-4.394 4.394a.5.5 0 0 1-.353.146H4.893a.5.5 0 0 1-.353-.146L.146 11.46A.5.5 0 0 1 0 11.107V4.893a.5.5 0 0 1 .146-.353zM5.1 1 1 5.1v5.8L5.1 15h5.8l4.1-4.1V5.1L10.9 1z"/>
+                                    </svg>
+                                    <span style="white-space: nowrap; padding-right: 10px;"> Počet cyklů: </span>
+                                </div>
+                                <span id="molNumRings"></span>
+                            </div>
+                        </div>
+                        <div class="basicData">
+                            <div class="flexCenterDots">
+                                <div class="iconAndText">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="black" class="bi bi-fire" viewBox="0 0 16 16">
+                                        <path d="M8 16c3.314 0 6-2 6-5.5 0-1.5-.5-4-2.5-6 .25 1.5-1.25 2-1.25 2C11 4 9 .5 6 0c.357 2 .5 4-2 6-1.25 1-2 2.729-2 4.5C2 14 4.686 16 8 16m0-1c-1.657 0-3-1-3-2.75 0-.75.25-2 1.25-3C6.125 10 7 10.5 7 10.5c-.375-1.25.5-3.25 2-3.5-.179 1-.25 2 1 3 .625.5 1 1.364 1 2.25C11 14 9.657 15 8 15"/>
+                                    </svg>
+                                    <span style="white-space: nowrap; padding-right: 10px;"> Bod varu: </span>
+                                </div>
+                                <span id="molBoilingPoint"></span>
+                            </div>
+                        </div>
+                        <div class="basicData">
+                            <div class="flexCenterDots">
+                                <div class="iconAndText">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="black" class="bi bi-snow" viewBox="0 0 16 16">
+                                        <path d="M8 16a.5.5 0 0 1-.5-.5v-1.293l-.646.647a.5.5 0 0 1-.707-.708L7.5 12.793V8.866l-3.4 1.963-.496 1.85a.5.5 0 1 1-.966-.26l.237-.882-1.12.646a.5.5 0 0 1-.5-.866l1.12-.646-.884-.237a.5.5 0 1 1 .26-.966l1.848.495L7 8 3.6 6.037l-1.85.495a.5.5 0 0 1-.258-.966l.883-.237-1.12-.646a.5.5 0 1 1 .5-.866l1.12.646-.237-.883a.5.5 0 1 1 .966-.258l.495 1.849L7.5 7.134V3.207L6.147 1.854a.5.5 0 1 1 .707-.708l.646.647V.5a.5.5 0 1 1 1 0v1.293l.647-.647a.5.5 0 1 1 .707.708L8.5 3.207v3.927l3.4-1.963.496-1.85a.5.5 0 1 1 .966.26l-.236.882 1.12-.646a.5.5 0 0 1 .5.866l-1.12.646.883.237a.5.5 0 1 1-.26.966l-1.848-.495L9 8l3.4 1.963 1.849-.495a.5.5 0 0 1 .259.966l-.883.237 1.12.646a.5.5 0 0 1-.5.866l-1.12-.646.236.883a.5.5 0 1 1-.966.258l-.495-1.849-3.4-1.963v3.927l1.353 1.353a.5.5 0 0 1-.707.708l-.647-.647V15.5a.5.5 0 0 1-.5.5z"/>
+                                    </svg>
+                                    <span style="white-space: nowrap; padding-right: 10px;"> Bod mrazu: </span>
+                                </div>
+                                <span id="molMeltingPoint"></span>
+                            </div>
+                        </div>
+                        <div class="basicData">
+                            <div class="flexCenterDots">
+                                <div class="iconAndText">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="black" class="bi bi-pen" viewBox="0 0 16 16">
+                                        <path d="m13.498.795.149-.149a1.207 1.207 0 1 1 1.707 1.708l-.149.148a1.5 1.5 0 0 1-.059 2.059L4.854 14.854a.5.5 0 0 1-.233.131l-4 1a.5.5 0 0 1-.606-.606l1-4a.5.5 0 0 1 .131-.232l9.642-9.642a.5.5 0 0 0-.642.056L6.854 4.854a.5.5 0 1 1-.708-.708L9.44.854A1.5 1.5 0 0 1 11.5.796a1.5 1.5 0 0 1 1.998-.001m-.644.766a.5.5 0 0 0-.707 0L1.95 11.756l-.764 3.057 3.057-.764L14.44 3.854a.5.5 0 0 0 0-.708z"/>
+                                    </svg>
+                                    <span style="white-space: nowrap; padding-right: 10px;"> Popis: </span>
+                                </div>
+                                <span id="molDescription"></span>
+                            </div>
+                        </div>
+                        <div class="basicData">
+                            <div class="flexCenter">
+                                <div class="containerDotsB" id="molSafetyDots">
+                                    <div class="cube"><div class="cube__inner"></div></div>
+                                    <div class="cube"><div class="cube__inner"></div></div>
+                                    <div class="cube"><div class="cube__inner"></div></div>
+                                </div>
+                            </div>
+                            <div id="molSafetyDiv" class="flexSafety"></div>
+                        </div>
+                    </div>
+
+                    <div class="designDiv">
+                        <div class="basicData">
+                            <span id="bigTxt">VYUŽITÍ</span>
+                            <div id="line" class="flexCenter"></div>
+                        </div>
+
+                        <div class="basicData">
+                            <div class="flexCenter">
+                                <div class="containerDotsB" id="usesDotsTP">
+                                    <div class="cube"><div class="cube__inner"></div></div>
+                                    <div class="cube"><div class="cube__inner"></div></div>
+                                    <div class="cube"><div class="cube__inner"></div></div>
+                                </div>
+                            </div>
+                            <div id="usesTP"></div>
+                            
+                        </div>
+                    </div>
+
+                    <div class="designDiv" id="noReactionTP">
+                        <div class="basicData">
+                            <span id="bigTxt">REAKCE</span><svg id="paidFeatureLockTP" class="closeBtn" xmlns="http://www.w3.org/2000/svg" width="60" height="60" fill="black" class="bi bi-lock" viewBox="0 0 16 16">
+                                <path d="M8 1a2 2 0 0 1 2 2v4H6V3a2 2 0 0 1 2-2m3 6V3a3 3 0 0 0-6 0v4a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2M5 8h6a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1"/>
+                              </svg>
+                            <div id="line" class="flexCenter"></div>
+                        </div>
+                        <div class="basicData reactionMoreDivTP">
+                            <button id="reaction1BtnTP"><span id="reaction1TP"></span>
+                                <div class="containerDotsB reactionDotsTP">
+                                    <div class="cube"><div class="cube__inner"></div></div>
+                                    <div class="cube"><div class="cube__inner"></div></div>
+                                    <div class="cube"><div class="cube__inner"></div></div>
+                                </div>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" fill="black" class="bi bi-arrow-right-short" viewBox="0 0 16 16">
+                                <path fill-rule="evenodd" d="M4 8a.5.5 0 0 1 .5-.5h5.793L8.146 5.354a.5.5 0 1 1 .708-.708l3 3a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708-.708L10.293 8.5H4.5A.5.5 0 0 1 4 8"/>
+                              </svg></button>
+                        </div>
+                        <div class="basicData reactionMoreDivTP">
+                            <button id="reaction2BtnTP"><span id="reaction2TP"></span>
+                                <div class="containerDotsB reactionDotsTP">
+                                    <div class="cube"><div class="cube__inner"></div></div>
+                                    <div class="cube"><div class="cube__inner"></div></div>
+                                    <div class="cube"><div class="cube__inner"></div></div>
+                                </div>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" fill="black" class="bi bi-arrow-right-short" viewBox="0 0 16 16">
+                                <path fill-rule="evenodd" d="M4 8a.5.5 0 0 1 .5-.5h5.793L8.146 5.354a.5.5 0 1 1 .708-.708l3 3a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708-.708L10.293 8.5H4.5A.5.5 0 0 1 4 8"/>
+                              </svg></button>
+                        </div>
+                        <div class="basicData reactionMoreDivTP">
+                            <button id="reaction3BtnTP"><span id="reaction3TP"></span>
+                                <div class="containerDotsB reactionDotsTP">
+                                    <div class="cube"><div class="cube__inner"></div></div>
+                                    <div class="cube"><div class="cube__inner"></div></div>
+                                    <div class="cube"><div class="cube__inner"></div></div>
+                                </div>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" fill="black" class="bi bi-arrow-right-short" viewBox="0 0 16 16">
+                                <path fill-rule="evenodd" d="M4 8a.5.5 0 0 1 .5-.5h5.793L8.146 5.354a.5.5 0 1 1 .708-.708l3 3a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708-.708L10.293 8.5H4.5A.5.5 0 0 1 4 8"/>
+                              </svg></button>
+                        </div>
+                        <div id="paidFeatureTP" class="basicData textCenter paidSection">
+                            <button style="color: black;" class="paidButton" onclick="paypalOpen()">
+                                <svg style="animation: woobleBottom 2s ease 0s infinite normal forwards;" xmlns="http://www.w3.org/2000/svg" width="60" height="60" fill="black" class="bi bi-cash-coin" viewBox="0 0 16 16">
+                                    <path fill-rule="evenodd" d="M11 15a4 4 0 1 0 0-8 4 4 0 0 0 0 8m5-4a5 5 0 1 1-10 0 5 5 0 0 1 10 0"/>
+                                    <path d="M9.438 11.944c.047.596.518 1.06 1.363 1.116v.44h.375v-.443c.875-.061 1.386-.529 1.386-1.207 0-.618-.39-.936-1.09-1.1l-.296-.07v-1.2c.376.043.614.248.671.532h.658c-.047-.575-.54-1.024-1.329-1.073V8.5h-.375v.45c-.747.073-1.255.522-1.255 1.158 0 .562.378.92 1.007 1.066l.248.061v1.272c-.384-.058-.639-.27-.696-.563h-.668zm1.36-1.354c-.369-.085-.569-.26-.569-.522 0-.294.216-.514.572-.578v1.1zm.432.746c.449.104.655.272.655.569 0 .339-.257.571-.709.614v-1.195z"/>
+                                    <path d="M1 0a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h4.083q.088-.517.258-1H3a2 2 0 0 0-2-2V3a2 2 0 0 0 2-2h10a2 2 0 0 0 2 2v3.528c.38.34.717.728 1 1.154V1a1 1 0 0 0-1-1z"/>
+                                    <path d="M9.998 5.083 10 5a2 2 0 1 0-3.132 1.65 6 6 0 0 1 3.13-1.567"/>
+                                </svg> <br>
+                                PODPOŘTE NÁS <br> a získejte přístup k prémiovým funkcím!
+                                <p id="payPalTP"><svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="black" class="bi bi-paypal" viewBox="0 0 16 16">
+                                    <path d="M14.06 3.713c.12-1.071-.093-1.832-.702-2.526C12.628.356 11.312 0 9.626 0H4.734a.7.7 0 0 0-.691.59L2.005 13.509a.42.42 0 0 0 .415.486h2.756l-.202 1.28a.628.628 0 0 0 .62.726H8.14c.429 0 .793-.31.862-.731l.025-.13.48-3.043.03-.164.001-.007a.35.35 0 0 1 .348-.297h.38c1.266 0 2.425-.256 3.345-.91q.57-.403.993-1.005a4.94 4.94 0 0 0 .88-2.195c.242-1.246.13-2.356-.57-3.154a2.7 2.7 0 0 0-.76-.59l-.094-.061ZM6.543 8.82a.7.7 0 0 1 .321-.079H8.3c2.82 0 5.027-1.144 5.672-4.456l.003-.016q.326.186.548.438c.546.623.679 1.535.45 2.71-.272 1.397-.866 2.307-1.663 2.874-.802.57-1.842.815-3.043.815h-.38a.87.87 0 0 0-.863.734l-.03.164-.48 3.043-.024.13-.001.004a.35.35 0 0 1-.348.296H5.595a.106.106 0 0 1-.105-.123l.208-1.32z"/>
+                                  </svg>PayPal</p>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="disclaimer">DISCLAIMER: Tato aplikace využívá AI a nemůže zaručit stoprocentní správnost informací. Použitím souhlasíte s tímto prohlášením.</div>
+                </div>
+
+
+                <div id="reactionDiv" class="displayNone">
+                    <div class="designDiv">
+                        <div class="basicData">
+                            <span id="bigTxt">REAKCE</span>
+                            <div id="line" class="flexCenter"></div>
+                        </div>
+                        <div class="basicData" id="reactionDataDiv">
+                            
+                        </div>
+                    </div>
+                    <div class="disclaimer">DISCLAIMER: Tato aplikace využívá AI a nemůže zaručit stoprocentní správnost informací. Použitím souhlasíte s tímto prohlášením.</div>
+                </div>
+
+                <div id="solvingReactionDiv" class="displayNone">
+                    <div class="designDiv">
+                        <div class="basicData">
+                            <span id="bigTxt">VYČÍSLENÍ ROVNICE</span>
+                            <div id="line" class="flexCenter"></div>
+                        </div>
+                        <div style="display: flex; align-items: center; justify-content: space-between;" class="classicBtnDiv">
+                            <div style="width: 100%;">
+                                <button class="classicBtn" id="reactionDesc"><svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="black" class="bi bi-question-circle" viewBox="0 0 16 16" style="margin-right: 20px;">
+                                    <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
+                                    <path d="M5.255 5.786a.237.237 0 0 0 .241.247h.825c.138 0 .248-.113.266-.25.09-.656.54-1.134 1.342-1.134.686 0 1.314.343 1.314 1.168 0 .635-.374.927-.965 1.371-.673.489-1.206 1.06-1.168 1.987l.003.217a.25.25 0 0 0 .25.246h.811a.25.25 0 0 0 .25-.25v-.105c0-.718.273-.927 1.01-1.486.609-.463 1.244-.977 1.244-2.056 0-1.511-1.276-2.241-2.673-2.241-1.267 0-2.655.59-2.75 2.286m1.557 5.763c0 .533.425.927 1.01.927.609 0 1.028-.394 1.028-.927 0-.552-.42-.94-1.029-.94-.584 0-1.009.388-1.009.94"/>
+                                </svg>Postup řešení rovnice</button>
+                            </div>
+                            <div id="reactionDescPaid">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="black" class="bi bi-lock" viewBox="0 0 16 16" style="margin-right: 20px;">
+                                    <path d="M8 1a2 2 0 0 1 2 2v4H6V3a2 2 0 0 1 2-2m3 6V3a3 3 0 0 0-6 0v4a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2M5 8h6a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1"/>
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="basicData" id="solvingReactionDataDiv">
+                            
+                        </div>
+                    </div>
+                    <div class="disclaimer">DISCLAIMER: Tato aplikace využívá AI a nemůže zaručit stoprocentní správnost informací. Použitím souhlasíte s tímto prohlášením.</div>
+                </div>
+
+                <div id="errorDiv" class="displayNone">
+                    <div class="designDiv">
+                        <div class="basicData">
+                            <span id="bigTxt">ERROR</span>
+                            <div id="line" class="flexCenter"></div>
+                        </div>
+                        <div class="basicData">
+                            <span id="errorName"></span>
+                            
+                        </div>
+                    </div>
+                    <div class="disclaimer">DISCLAIMER: Tato aplikace využívá AI a nemůže zaručit stoprocentní správnost informací. Použitím souhlasíte s tímto prohlášením.</div>
+                </div>
+
+                <div id="searchDiv" class="displayNone">
+                    <div class="designDivSearchBox">
+                        <div class="basicData searchDesignDiv">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
+                                <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0"/>
+                              </svg><input class="searchInput" placeholder="benzen, H2O, ..." type="text" id="searchBox">
+                        </div>
+                    </div>
+                    <div id="periodicTableBtnDiv">
+                        <button id="periodicTableBtn" onclick="showPeriodicTable()"><svg id="periodicTableBtnSvg" xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="white" class="bi bi-table" viewBox="0 0 16 16">
+                            <path d="M0 2a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2zm15 2h-4v3h4zm0 4h-4v3h4zm0 4h-4v3h3a1 1 0 0 0 1-1zm-5 3v-3H6v3zm-5 0v-3H1v2a1 1 0 0 0 1 1zm-4-4h4V8H1zm0-4h4V4H1zm5-3v3h4V4zm4 4H6v3h4z"/>
+                          </svg>Periodická tabulka</button>
+                    </div>
+                    <div class="designDiv" id="searchDesignDivParent">
+                        <div class="basicData" id="searchDataDiv"></div>
+                    </div>
+                    <div id="pTShowType" style="display: none;">
+                        <p>Typ zobrazení</p>
+                        <button class="transparentBtn" onclick="showPTGrid()"><svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="lightgray" class="bi bi-grid-3x3-gap-fill" viewBox="0 0 16 16">
+                            <path d="M1 2a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1zm5 0a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1zm5 0a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1h-2a1 1 0 0 1-1-1zM1 7a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1zm5 0a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1zm5 0a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1h-2a1 1 0 0 1-1-1zM1 12a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1zm5 0a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1zm5 0a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1h-2a1 1 0 0 1-1-1z"/>
+                        </svg></button>
+                        <button class="transparentBtn" onclick="showPTList()"><svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="lightgray" class="bi bi-list-task" viewBox="0 0 16 16">
+                            <path fill-rule="evenodd" d="M2 2.5a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5V3a.5.5 0 0 0-.5-.5zM3 3H2v1h1z"/>
+                            <path d="M5 3.5a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5M5.5 7a.5.5 0 0 0 0 1h9a.5.5 0 0 0 0-1zm0 4a.5.5 0 0 0 0 1h9a.5.5 0 0 0 0-1z"/>
+                            <path fill-rule="evenodd" d="M1.5 7a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5H2a.5.5 0 0 1-.5-.5zM2 7h1v1H2zm0 3.5a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5zm1 .5H2v1h1z"/>
+                        </svg></button>
+                    </div>
+                    <div id="pTList" style="display: none;"></div>
+                    <div id="periodicTable" style="display: none;">
+                        <div id="periodicTableGrid">
+                            <div class="periodicTableElement" id="pTElement1"></div>
+                            <div class="periodicTableElement" id="pTBlank"></div>
+                            <div class="periodicTableElement" id="pTBlank"></div>
+                            <div class="periodicTableElement" id="pTBlank"></div>
+                            <div class="periodicTableElement" id="pTBlank"></div>
+                            <div class="periodicTableElement" id="pTBlank"></div>
+                            <div class="periodicTableElement" id="pTBlank"></div>
+                            <div class="periodicTableElement" id="pTBlank"></div>
+                            <div class="periodicTableElement" id="pTBlank"></div>
+                            <div class="periodicTableElement" id="pTBlank"></div>
+                            <div class="periodicTableElement" id="pTBlank"></div>
+                            <div class="periodicTableElement" id="pTBlank"></div>
+                            <div class="periodicTableElement" id="pTBlank"></div>
+                            <div class="periodicTableElement" id="pTBlank"></div>
+                            <div class="periodicTableElement" id="pTBlank"></div>
+                            <div class="periodicTableElement" id="pTBlank"></div>
+                            <div class="periodicTableElement" id="pTBlank"></div>
+                            <div class="periodicTableElement" id="pTElement2"></div>
+                            <div class="periodicTableElement" id="pTElement3"></div>
+                            <div class="periodicTableElement" id="pTElement4"></div>
+                            <div class="periodicTableElement" id="pTBlank"></div>
+                            <div class="periodicTableElement" id="pTBlank"></div>
+                            <div class="periodicTableElement" id="pTBlank"></div>
+                            <div class="periodicTableElement" id="pTBlank"></div>
+                            <div class="periodicTableElement" id="pTBlank"></div>
+                            <div class="periodicTableElement" id="pTBlank"></div>
+                            <div class="periodicTableElement" id="pTBlank"></div>
+                            <div class="periodicTableElement" id="pTBlank"></div>
+                            <div class="periodicTableElement" id="pTBlank"></div>
+                            <div class="periodicTableElement" id="pTBlank"></div>
+                            <div class="periodicTableElement" id="pTElement5"></div>
+                            <div class="periodicTableElement" id="pTElement6"></div>
+                            <div class="periodicTableElement" id="pTElement7"></div>
+                            <div class="periodicTableElement" id="pTElement8"></div>
+                            <div class="periodicTableElement" id="pTElement9"></div>
+                            <div class="periodicTableElement" id="pTElement10"></div>
+                            <div class="periodicTableElement" id="pTElement11"></div>
+                            <div class="periodicTableElement" id="pTElement12"></div>
+                            <div class="periodicTableElement" id="pTBlank"></div>
+                            <div class="periodicTableElement" id="pTBlank"></div>
+                            <div class="periodicTableElement" id="pTBlank"></div>
+                            <div class="periodicTableElement" id="pTBlank"></div>
+                            <div class="periodicTableElement" id="pTBlank"></div>
+                            <div class="periodicTableElement" id="pTBlank"></div>
+                            <div class="periodicTableElement" id="pTBlank"></div>
+                            <div class="periodicTableElement" id="pTBlank"></div>
+                            <div class="periodicTableElement" id="pTBlank"></div>
+                            <div class="periodicTableElement" id="pTBlank"></div>
+                            <div class="periodicTableElement" id="pTElement13"></div>
+                            <div class="periodicTableElement" id="pTElement14"></div>
+                            <div class="periodicTableElement" id="pTElement15"></div>
+                            <div class="periodicTableElement" id="pTElement16"></div>
+                            <div class="periodicTableElement" id="pTElement17"></div>
+                            <div class="periodicTableElement" id="pTElement18"></div>
+                            <div class="periodicTableElement" id="pTElement19"></div>
+                            <div class="periodicTableElement" id="pTElement20"></div>
+                            <div class="periodicTableElement" id="pTElement21"></div>
+                            <div class="periodicTableElement" id="pTElement22"></div>
+                            <div class="periodicTableElement" id="pTElement23"></div>
+                            <div class="periodicTableElement" id="pTElement24"></div>
+                            <div class="periodicTableElement" id="pTElement25"></div>
+                            <div class="periodicTableElement" id="pTElement26"></div>
+                            <div class="periodicTableElement" id="pTElement27"></div>
+                            <div class="periodicTableElement" id="pTElement28"></div>
+                            <div class="periodicTableElement" id="pTElement29"></div>
+                            <div class="periodicTableElement" id="pTElement30"></div>
+                            <div class="periodicTableElement" id="pTElement31"></div>
+                            <div class="periodicTableElement" id="pTElement32"></div>
+                            <div class="periodicTableElement" id="pTElement33"></div>
+                            <div class="periodicTableElement" id="pTElement34"></div>
+                            <div class="periodicTableElement" id="pTElement35"></div>
+                            <div class="periodicTableElement" id="pTElement36"></div>  
+                            <div class="periodicTableElement" id="pTElement37"></div>
+                            <div class="periodicTableElement" id="pTElement38"></div>
+                            <div class="periodicTableElement" id="pTElement39"></div>
+                            <div class="periodicTableElement" id="pTElement40"></div>
+                            <div class="periodicTableElement" id="pTElement41"></div>
+                            <div class="periodicTableElement" id="pTElement42"></div>
+                            <div class="periodicTableElement" id="pTElement43"></div>
+                            <div class="periodicTableElement" id="pTElement44"></div>
+                            <div class="periodicTableElement" id="pTElement45"></div>
+                            <div class="periodicTableElement" id="pTElement46"></div>
+                            <div class="periodicTableElement" id="pTElement47"></div>
+                            <div class="periodicTableElement" id="pTElement48"></div>
+                            <div class="periodicTableElement" id="pTElement49"></div>
+                            <div class="periodicTableElement" id="pTElement50"></div>
+                            <div class="periodicTableElement" id="pTElement51"></div>
+                            <div class="periodicTableElement" id="pTElement52"></div>
+                            <div class="periodicTableElement" id="pTElement53"></div>
+                            <div class="periodicTableElement" id="pTElement54"></div>
+                            <div class="periodicTableElement" id="pTElement55"></div>
+                            <div class="periodicTableElement" id="pTElement56"></div>
+                            <div class="periodicTableElement" id="pTBlank"></div>
+                            <div class="periodicTableElement" id="pTElement72"></div>
+                            <div class="periodicTableElement" id="pTElement73"></div>
+                            <div class="periodicTableElement" id="pTElement74"></div>
+                            <div class="periodicTableElement" id="pTElement75"></div>
+                            <div class="periodicTableElement" id="pTElement76"></div>
+                            <div class="periodicTableElement" id="pTElement77"></div>
+                            <div class="periodicTableElement" id="pTElement78"></div>
+                            <div class="periodicTableElement" id="pTElement79"></div>
+                            <div class="periodicTableElement" id="pTElement80"></div>
+                            <div class="periodicTableElement" id="pTElement81"></div>
+                            <div class="periodicTableElement" id="pTElement82"></div>
+                            <div class="periodicTableElement" id="pTElement83"></div>
+                            <div class="periodicTableElement" id="pTElement84"></div>
+                            <div class="periodicTableElement" id="pTElement85"></div>
+                            <div class="periodicTableElement" id="pTElement86"></div>
+                            <div class="periodicTableElement" id="pTElement87"></div>
+                            <div class="periodicTableElement" id="pTElement88"></div>
+                            <div class="periodicTableElement" id="pTBlank"></div>
+                            <div class="periodicTableElement" id="pTElement104"></div>
+                            <div class="periodicTableElement" id="pTElement105"></div>
+                            <div class="periodicTableElement" id="pTElement106"></div>
+                            <div class="periodicTableElement" id="pTElement107"></div>
+                            <div class="periodicTableElement" id="pTElement108"></div>
+                            <div class="periodicTableElement" id="pTElement109"></div>
+                            <div class="periodicTableElement" id="pTElement110"></div>
+                            <div class="periodicTableElement" id="pTElement111"></div>
+                            <div class="periodicTableElement" id="pTElement112"></div>
+                            <div class="periodicTableElement" id="pTElement113"></div>
+                            <div class="periodicTableElement" id="pTElement114"></div>
+                            <div class="periodicTableElement" id="pTElement115"></div>
+                            <div class="periodicTableElement" id="pTElement116"></div>
+                            <div class="periodicTableElement" id="pTElement117"></div>
+                            <div class="periodicTableElement" id="pTElement118"></div>
+                            <div class="periodicTableElement pTSmallGap" id="pTBlank"></div>
+                            <div class="periodicTableElement pTSmallGap" id="pTBlank"></div>
+                            <div class="periodicTableElement pTSmallGap" id="pTBlank"></div>
+                            <div class="periodicTableElement pTSmallGap" id="pTBlank"></div>
+                            <div class="periodicTableElement pTSmallGap" id="pTBlank"></div>
+                            <div class="periodicTableElement pTSmallGap" id="pTBlank"></div>
+                            <div class="periodicTableElement pTSmallGap" id="pTBlank"></div>
+                            <div class="periodicTableElement pTSmallGap" id="pTBlank"></div>
+                            <div class="periodicTableElement pTSmallGap" id="pTBlank"></div>
+                            <div class="periodicTableElement pTSmallGap" id="pTBlank"></div>
+                            <div class="periodicTableElement pTSmallGap" id="pTBlank"></div>
+                            <div class="periodicTableElement pTSmallGap" id="pTBlank"></div>
+                            <div class="periodicTableElement pTSmallGap" id="pTBlank"></div>
+                            <div class="periodicTableElement pTSmallGap" id="pTBlank"></div>
+                            <div class="periodicTableElement pTSmallGap" id="pTBlank"></div>
+                            <div class="periodicTableElement pTSmallGap" id="pTBlank"></div>
+                            <div class="periodicTableElement pTSmallGap" id="pTBlank"></div>
+                            <div class="periodicTableElement pTSmallGap" id="pTBlank"></div>
+                            <div class="periodicTableElement" id="pTBlank"></div>
+                            <div class="periodicTableElement" id="pTBlank"></div>
+                            <div class="periodicTableElement" id="pTElement57"></div>
+                            <div class="periodicTableElement" id="pTElement58"></div>
+                            <div class="periodicTableElement" id="pTElement59"></div>
+                            <div class="periodicTableElement" id="pTElement60"></div>
+                            <div class="periodicTableElement" id="pTElement61"></div>
+                            <div class="periodicTableElement" id="pTElement62"></div>
+                            <div class="periodicTableElement" id="pTElement63"></div>
+                            <div class="periodicTableElement" id="pTElement64"></div>
+                            <div class="periodicTableElement" id="pTElement65"></div>
+                            <div class="periodicTableElement" id="pTElement66"></div>
+                            <div class="periodicTableElement" id="pTElement67"></div>
+                            <div class="periodicTableElement" id="pTElement68"></div>
+                            <div class="periodicTableElement" id="pTElement69"></div>
+                            <div class="periodicTableElement" id="pTElement70"></div>
+                            <div class="periodicTableElement" id="pTElement71"></div>
+                            <div class="periodicTableElement" id="pTBlank"></div>
+                            <div class="periodicTableElement" id="pTBlank"></div>
+                            <div class="periodicTableElement" id="pTBlank"></div>
+                            <div class="periodicTableElement" id="pTElement89"></div>
+                            <div class="periodicTableElement" id="pTElement90"></div>
+                            <div class="periodicTableElement" id="pTElement91"></div>
+                            <div class="periodicTableElement" id="pTElement92"></div>
+                            <div class="periodicTableElement" id="pTElement93"></div>
+                            <div class="periodicTableElement" id="pTElement94"></div>
+                            <div class="periodicTableElement" id="pTElement95"></div>
+                            <div class="periodicTableElement" id="pTElement96"></div>
+                            <div class="periodicTableElement" id="pTElement97"></div>
+                            <div class="periodicTableElement" id="pTElement98"></div>
+                            <div class="periodicTableElement" id="pTElement99"></div>
+                            <div class="periodicTableElement" id="pTElement100"></div>
+                            <div class="periodicTableElement" id="pTElement101"></div>
+                            <div class="periodicTableElement" id="pTElement102"></div>
+                            <div class="periodicTableElement" id="pTElement103"></div>
+                            <div class="periodicTableElement" id="pTBlank"></div>
+                        </div>
+
+                    </div>
+                    <div class="disclaimer">DISCLAIMER: Tato aplikace využívá AI a nemůže zaručit stoprocentní správnost informací. Použitím souhlasíte s tímto prohlášením.</div>
+                </div>
+
+
+            </div>
+            
+
+        </div>
+    </div>
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-GXT755RYYB"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+
+        gtag('config', 'G-GXT755RYYB');
+    </script>
+
+    <script type="text/javascript" src="https://unpkg.com/smiles-drawer@2.0.1/dist/smiles-drawer.min.js"></script>
+    
+
+    <script type="text/javascript" charset="utf-8">
+        document.getElementById("startup").style.display = "block";
+        //document.getElementById("windowHeight").style.height = window.innerHeight+"px";
+      
+        var socket = io.connect(window.location.protocol + '//' + document.domain + ':' + location.port);
+        socket.on('connect', function(){
+            console.log("Connected...!", socket.connected)
+        });
+
+
+        var canvas = document.getElementById('canvas');
+        var answer = document.getElementById('answer');
+        var context = canvas.getContext('2d');
+        const video = document.querySelector("#videoElement");
+        
+        var cropper;
+
+        //video.width = 400;
+        //video.height = 800; 
+        function start() {
+            if (navigator.mediaDevices.getUserMedia) {
+            navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
+            .then(function (stream) {
+                video.srcObject = stream;
+                video.classList.remove("displayNone");
+                document.getElementById("bottomBar2").classList.remove("slideUpAn")
+                document.getElementById("moreImagesBtn").style.display = "none";
+                document.body.style.overflow = "hidden";
+                video.play();
+                setTimeout(function(){document.getElementById("startup").classList.add("fadeOut");}, 1500);
+                //document.getElementById("overlay").style.display = "block";
+                
+            })
+            .catch(function (err0r) {
+
+            });
+            
+        }}
+        function takePhoto() {
+            const mediaStream = video.srcObject;
+
+            // Through the MediaStream, you can get the MediaStreamTracks with getTracks():
+            document.getElementById('canvasDiv').setAttribute("style","height:"+video.clientHeight+"px");
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            console.log(video.videoWidth);
+            console.log(video.videoHeight);
+
+            party.sparkles(document.getElementById("acceptBtn"), {
+                count: party.variation.range(20, 40),
+                size: party.variation.range(0.5, 1.5),
+                velocity: party.variation.range(1, 6),
+                angularVelocity: party.variation.range(0, 10),
+                shapes: ['circle'],
+                color: party.Color.fromHex("#ffffff")
+            });
+            document.getElementById('canvasDiv').classList.remove("displayNone");
+            document.getElementById('acceptBtn').classList.remove("displayNone");
+            document.getElementById('reloadBtn').classList.remove("displayNone");
+            document.getElementById('takePhotoBtn').classList.add("displayNone");
+            document.getElementById('searchBtn').classList.add("displayNone");
+
+            canvas.classList.remove("displayNone");
+            
+            context.drawImage( video, 0, 0, canvas.width, canvas.height );
+            const tracks = mediaStream.getTracks();
+            tracks.forEach(track => track.stop());
+            video.classList.add("displayNone");
+
+            image = canvas.toDataURL('image/jpeg');
+            //photo.setAttribute("src",image);
+            cropper = new Cropper(canvas, {zoomable:false, movable:false});
+
+        }
+        function scan() {
+            document.getElementById("bottomBar2").classList.add("slideUpAn")
+            
+            socket.emit('image', cropper.getCroppedCanvas().toDataURL('image/jpeg'));
+        }
+
+        socket.on('response_back_mI', function(data){
+            molWeightMI.textContent=data["mol_weight"];
+            molNumAtomsMI.textContent=data["num_atoms"];
+            molNumRingsMI.textContent=data["num_rings"];
+            molBoilingPointMI.textContent=data["mol_boiling_point"];
+            molMeltingPointMI.textContent=data["mol_melting_point"];
+            molDescriptionMI.textContent=data["mol_description"];
+            
+            document.getElementById("moreInfoCB").disabled = false;
+
+            molWeightMI.style.width = "100%";
+            molNumAtomsMI.style.width = "100%";
+            molNumRingsMI.style.width = "100%";
+            molBoilingPointMI.style.width = "100%";
+            molMeltingPointMI.style.width = "100%";
+            molDescriptionMI.style.width = "100%";
+            const collection = document.getElementsByClassName("moreInfoDots");
+            for (let i = 0; i < collection.length; i++) {
+                collection[i].style.display = "none";
+            }
+            
+        })
+
+        socket.on('response_back_chemBotGPT', function(data){
+            document.getElementById("chemBotDots").style.display = "none";
+            document.getElementById("chemBotLoader").classList.add("chemBotSmallerAn");
+            
+            document.getElementById("chemBotReloadDiv").style.display = "flex";
+            document.getElementById("chemBotGPT").innerHTML=data;
+            //document.getElementById("chemBotChatDiv").style.display = "none";
+            
+        })
+
+        socket.on('response_back_moreNamesMI', function(data){
+            molMoreNamesMI.textContent=data; 
+            document.getElementById("moreInfoDotsNames").style.display = "none";
+            
+        })
+
+        socket.on('response_back_mIRS', function(data){
+            //molImageS.setAttribute('src', data["mol_image"]);
+            //molNameS.textContent=data["mol_name_cs"];
+            //molWeightS.textContent=data["mol_weight"];
+            //molNumAtomsS.textContent=data["num_atoms"];
+            //molNumRingsS.textContent=data["num_rings"];
+            if(data["reaction_type"] != "neznámé"){
+                reaction1.textContent=data["reaction_type"][0];
+                reaction2.textContent=data["reaction_type"][1];
+                reaction3.textContent=data["reaction_type"][2];
+                document.getElementById("reaction1").style.display = "block"
+                document.getElementById("reaction2").style.display = "block"
+                document.getElementById("reaction3").style.display = "block"
+
+                const collection = document.getElementsByClassName("reactionDots");
+                for (let i = 0; i < collection.length; i++) {
+                    collection[i].style.display = "none";
+                }
+
+                document.getElementById("reaction1Btn").onclick = function() {imageMoreReaction(data["reaction1"])};
+                document.getElementById("reaction2Btn").onclick = function() {imageMoreReaction(data["reaction2"])};
+                document.getElementById("reaction3Btn").onclick = function() {imageMoreReaction(data["reaction3"])};
+                document.getElementById("reaction1").disabled = false;
+                document.getElementById("reaction2").disabled = false;
+                document.getElementById("reaction3").disabled = false;
+            }
+            else {
+                document.getElementById("noReaction").style.display = "none";
+                const collection = document.getElementsByClassName("reactionMoreDiv");
+                for (let i = 0; i < collection.length; i++) {
+                    collection[i].style.display = "none";
+                }
+            }
+        })
+
+        socket.on('response_back_mIRTP', function(data){
+            if (data["reaction_type"] != "neznámé"){
+                //molImageS.setAttribute('src', data["mol_image"]);
+                //molNameS.textContent=data["mol_name_cs"];
+                //molWeightS.textContent=data["mol_weight"];
+                //molNumAtomsS.textContent=data["num_atoms"];
+                //molNumRingsS.textContent=data["num_rings"];
+                reaction1TP.textContent=data["reaction_type"][0];
+                reaction2TP.textContent=data["reaction_type"][1];
+                reaction3TP.textContent=data["reaction_type"][2];
+                document.getElementById("reaction1TP").style.display = "block"
+                document.getElementById("reaction2TP").style.display = "block"
+                document.getElementById("reaction3TP").style.display = "block"
+
+                const collection = document.getElementsByClassName("reactionDotsTP");
+                for (let i = 0; i < collection.length; i++) {
+                    collection[i].style.display = "none";
+                }
+
+                document.getElementById("reaction1BtnTP").onclick = function() {imageMoreReaction(data["reaction1"])};
+                document.getElementById("reaction2BtnTP").onclick = function() {imageMoreReaction(data["reaction2"])};
+                document.getElementById("reaction3BtnTP").onclick = function() {imageMoreReaction(data["reaction3"])};
+                document.getElementById("reaction1TP").disabled = false;
+                document.getElementById("reaction2TP").disabled = false;
+                document.getElementById("reaction3TP").disabled = false;
+            }
+            else {
+                document.getElementById("noReactionTP").style.display = "none";
+            }
+        })        
+
+        socket.on('response_back_moreUsesTP', function(data){
+            data.forEach((element, index, array) => {
+                const li = document.createElement("li");
+                li.textContent = element;
+                document.getElementById("usesTP").appendChild(li);
+            })
+            document.getElementById("usesDotsTP").style.display = "none";
+        })
+
+        socket.on('response_back_moreUsesS', function(data){
+            data.forEach((element, index, array) => {
+                const li = document.createElement("li");
+                li.textContent = element;
+                document.getElementById("usesS").appendChild(li);
+            })
+            document.getElementById("usesDotsS").style.display = "none";
+        })
+
+        socket.on('response_back_iMR', function(data){
+            data["mol_name_cs"].forEach((element, index, array) => {
+                    console.log(element);
+                    if(element== "="){
+                        const equal = document.createElement("span");
+                        equal.textContent= "↓";
+                        equal.classList.add("symbol")
+                        document.getElementById("moreReactionSearch").appendChild(equal);
+                        console.log("=")
+                    }
+                    else {
+                        const compoundDiv = document.createElement("div");
+                        compoundDiv.style.display = "grid";
+                        compoundDiv.onclick = function() {moreInfo(data["mol_data"][index])};
+                        document.getElementById("moreReactionSearch").appendChild(compoundDiv);
+
+                        const img = document.createElement("img");
+                        if (data["mol_image"][index] == "unknown") {
+                            img.setAttribute('src', "{{ url_for('static', filename='images/unknown.jpg') }}");
+                        } 
+                        else {
+                            img.setAttribute('data-smiles', data["mol_image"][index]);
+                            img.setAttribute('data-smiles-options', "{ 'terminalCarbons': true, 'compactDrawing': false ,'scale':5}");
+                        }
+                        
+                        compoundDiv.appendChild(img);
+                        console.log(element)
+
+                        const sp = document.createElement("span");
+                        sp.textContent= element;
+                        compoundDiv.appendChild(sp);
+                                                
+                        if(data["mol_name_cs"][index+1] != "=") {
+                            const plus = document.createElement("span");
+                            plus.textContent="+";
+                            plus.classList.add("symbol");
+                            document.getElementById("moreReactionSearch").appendChild(plus);
+                            console.log("+")
+                            
+                        }
+                    }
+                    
+                })
+            SmiDrawer.apply();
+            document.getElementById("moreInfoSearchDivR").style.paddingBottom = "20px";
+            document.getElementById("overlay").style.display = "none";
+            document.getElementById("moreInfoSearchReactionCB").disabled = false;
+            $('#moreReactionSearch').children().last().remove();
+        })
+
+        socket.on('response_back_mIS', function(data){
+            molImageS.setAttribute('data-smiles', data["mol_image"]);
+            molImageS.setAttribute('data-smiles-options', "{ 'terminalCarbons': true, 'compactDrawing': false ,'scale':5}");
+            SmiDrawer.apply();
+            molNameS.textContent=data["mol_name_cs"];
+            document.getElementById("moreImagesBtn").style.display = "flex";
+            molWeightS.textContent=data["mol_weight"];
+            molNumAtomsS.textContent=data["num_atoms"];
+            molNumRingsS.textContent=data["num_rings"];
+            molBoilingPointS.textContent=data["mol_boiling_point"];
+            molMeltingPointS.textContent=data["mol_melting_point"];
+            molDescriptionS.textContent=data["mol_description"];
+            
+            document.getElementById("moreInfoSearchCB").disabled = false;
+            molWeightS.style.width = "100%";
+            molNumAtomsS.style.width = "100%";
+            molNumRingsS.style.width = "100%";
+            molBoilingPointS.style.width = "100%";
+            molMeltingPointS.style.width = "100%";
+            molDescriptionS.style.width = "100%";
+            const collection = document.getElementsByClassName("moreInfoDotsS");
+            for (let i = 0; i < collection.length; i++) {
+                collection[i].style.display = "none";
+            }
+
+        })
+
+        socket.on('response_back_moreNamesTP', function(data){
+            document.getElementById("moreNamesDotsTP").style.display = "none";
+            molNameMoreTP.textContent=data;
+        })
+
+        socket.on('response_back_periodicTableMI', function(data){
+            compound_name = data["data_element"]
+            //yMargin = event.clientY - 300
+            document.getElementById("moreInfoSearchY").style.marginTop = "80px";
+            //console.log(event.clientY);
+            document.getElementById("moreInfoSearch").style.display = "block";
+            document.getElementById("moreInfoSearch").classList.add("fadeInAn")
+            document.getElementById("moreInfoSearchDiv").classList.add("scaleInAn")
+            document.getElementById("reaction1").style.display = "none";
+            document.getElementById("reaction2").style.display = "none";
+            document.getElementById("reaction3").style.display = "none";
+            document.getElementById("reaction1").disabled = true;
+            document.getElementById("reaction2").disabled = true;
+            document.getElementById("reaction3").disabled = true;
+            socket.emit('moreInfoS', compound_name);
+            socket.emit("moreNamesS", compound_name);
+            socket.emit("moreSafetyS", compound_name);
+            socket.emit("moreUsesS", compound_name);
+            paid_features = localStorage.getItem("paid");
+            if (paid_features == "true") {
+                document.getElementById("paidFeatureMIS").style.display = "none";
+                document.getElementById("paidFeatureLockMIS").style.display = "none";
+                const collection = document.getElementsByClassName("reactionMoreDiv");
+                for (let i = 0; i < collection.length; i++) {
+                    collection[i].style.display = "block";
+                }
+                socket.emit('moreInfoRS', compound_name);
+            }
+            else {
+                document.getElementById("paidFeatureMIS").style.display = "block";
+                document.getElementById("paidFeatureLockMIS").style.display = "block";
+                const collection = document.getElementsByClassName("reactionMoreDiv");
+                for (let i = 0; i < collection.length; i++) {
+                    collection[i].style.display = "none";
+                }
+            }
+        })
+
+        socket.on('response_back_moreNamesS', function(data){
+            document.getElementById("moreNamesDotsS").style.display = "none";
+            molMoreNamesS.textContent=data;
+        })
+
+        socket.on('response_back_moreSafetyS', function(data){
+            data["safety_url"].forEach((element, index, array) => {
+                const compoundDiv = document.createElement("div");
+                document.getElementById("moreSafetyDivS").appendChild(compoundDiv);
+                compoundDiv.classList.add("flexSafetyDiv");
+
+                const img = document.createElement("img");
+                img.setAttribute('src', data["safety_url"][index]);
+                img.style.width = "150px";
+                //img.style.filter = "url(#red-only)";
+                img.style.filter = "invert(1)";
+                compoundDiv.appendChild(img);
+
+                const sp = document.createElement("span");
+                sp.textContent= data["safety_name"][index];
+                compoundDiv.appendChild(sp);             
+            })
+            document.getElementById("moreSafetyDotsS").style.display = "none";
+        })
+
+        socket.on('response_back_moreSafetyTP', function(data){
+            data["safety_url"].forEach((element, index, array) => {
+                const compoundDiv = document.createElement("div");
+                document.getElementById("molSafetyDiv").appendChild(compoundDiv);
+                compoundDiv.classList.add("flexSafetyDiv");
+
+                const img = document.createElement("img");
+                img.setAttribute('src', data["safety_url"][index]);
+                img.style.width = "150px";
+                compoundDiv.appendChild(img);
+
+                const sp = document.createElement("span");
+                sp.textContent= data["safety_name"][index];
+                compoundDiv.appendChild(sp);             
+            })
+            document.getElementById("molSafetyDots").style.display = "none";
+        })
+
+        socket.on('response_back_moreSafetyMI', function(data){
+            data["safety_url"].forEach((element, index, array) => {
+                const compoundDiv = document.createElement("div");
+                document.getElementById("moreSafetyDiv").appendChild(compoundDiv);
+                compoundDiv.classList.add("flexSafetyDiv");
+
+                const img = document.createElement("img");
+                img.setAttribute('src', data["safety_url"][index]);
+                img.style.width = "150px";
+                img.style.filter = "url(#red-only)";
+                compoundDiv.appendChild(img);
+
+                const sp = document.createElement("span");
+                sp.textContent= data["safety_name"][index];
+                compoundDiv.appendChild(sp);             
+            })
+            document.getElementById("moreSafetyDots").style.display = "none";
+        })
+
+        socket.on('response_back_search', function(data){
+            const compoundDiv = document.createElement("div");
+            if (data["mol_cid"] != "neznámé") {
+                compoundDiv.onclick = function() {moreInfoSearch(data["mol_data"])};
+            }
+            compoundDiv.style.display = "grid";
+            document.getElementById("searchDataDiv").appendChild(compoundDiv);
+
+            const sp = document.createElement("span");
+            sp.textContent= data["mol_name_cs"];
+            sp.classList.add("bigTxt")
+            compoundDiv.appendChild(sp);
+
+            const sp2 = document.createElement("span");
+            sp2.textContent= "CID: " + data["mol_cid"];
+            compoundDiv.appendChild(sp2);
+
+            const line = document.createElement("div");
+            line.classList.add("line");
+            document.getElementById("searchDataDiv").appendChild(line);
+
+            document.getElementById("overlay").style.display = "none";
+            document.getElementById("searchDesignDivParent").style.display = "block";
+            $('#searchDataDiv').children().last().remove();
+            if (data["mol_cid"] == "") {
+                document.getElementById("searchDesignDivParent").style.display = "none";
+                document.getElementById("overlay").style.display = "none";
+            }
+        })
+
+        socket.on("response_back_moreImages", function(data){
+            if (data["img_url_list"].length != 0) {
+                document.getElementById("moreImagesDiv").classList.remove("flexCenter");
+                document.getElementById("moreImagesDiv").classList.add("flexImages");
+                data["img_url_list"].forEach((element, index, array) => {
+                    const img = document.createElement("img");
+                    const imgDiv = document.createElement("div");
+                    const span = document.createElement("span");
+                    span.textContent = data["img_description_list"][index];
+                    span.style.fontFamily = "report-regular";
+                    span.style.fontSize = "20px";
+                    span.style.textAlign = "center";
+                    span.style.float = "left";
+                    span.style.width = "100%";
+                    img.setAttribute('src', element);
+                    img.style.objectFit = "contain";
+                    img.style.filter = "invert(1)";
+                    img.style.height = "300px";
+                    imgDiv.appendChild(img);
+                    imgDiv.appendChild(span);
+                    document.getElementById("moreImagesDiv").appendChild(imgDiv);
+                })
+            }
+            else {
+                document.getElementById("flashMessageText").textContent = "Žádné obrázky nenalezeny";
+                document.getElementById("flashMessage").style.display = "flex";
+                document.getElementById("flashMessage").classList.add("scaleInAn")
+                setTimeout(function(){
+                    document.getElementById("flashMessage").classList.remove("scaleInAn")
+                    document.getElementById("flashMessage").classList.add("scaleOutAn");
+                }, 2000);
+                setTimeout(function(){
+                    document.getElementById("flashMessage").style.display = "none";
+                    document.getElementById("flashMessage").classList.remove("scaleOutAn")
+                }, 3000);
+                
+            }
+            
+            
+        })
+
+        socket.on("response_back_moreImagesTP", function(data){
+            if (data["img_url_list"].length != 0) {
+                document.getElementById("moreImagesDivTP").classList.remove("flexCenter");
+                document.getElementById("moreImagesDivTP").classList.add("flexImages");
+                data["img_url_list"].forEach((element, index, array) => {
+                    const img = document.createElement("img");
+                    const imgDiv = document.createElement("div");
+                    const span = document.createElement("span");
+                    span.textContent = data["img_description_list"][index];
+                    span.style.fontFamily = "report-regular";
+                    span.style.fontSize = "30px";
+                    span.style.textAlign = "center";
+                    span.style.float = "left";
+                    span.style.width = "100%";
+                    img.setAttribute('src', element);
+                    img.style.objectFit = "contain";
+                    img.style.height = "500px";
+                    imgDiv.appendChild(img);
+                    imgDiv.appendChild(span);
+                    document.getElementById("moreImagesDivTP").appendChild(imgDiv);
+                })
+            }
+            else {
+                document.getElementById("flashMessageText").textContent = "Žádné obrázky nenalezeny";
+                document.getElementById("flashMessage").style.display = "flex";
+                document.getElementById("flashMessage").classList.add("scaleInAn")
+                setTimeout(function(){
+                    document.getElementById("flashMessage").classList.remove("scaleInAn")
+                    document.getElementById("flashMessage").classList.add("scaleOutAn");
+                }, 2000);
+                setTimeout(function(){
+                    document.getElementById("flashMessage").style.display = "none";
+                    document.getElementById("flashMessage").classList.remove("scaleOutAn")
+                }, 3000);
+                
+            }
+        })
+
+        socket.on("response_back_reactionDesc", function(data){
+            document.getElementById("reactionDescData").innerHTML = data;
+            document.getElementById("reactionDescInfoCB").disabled = false;
+            document.getElementById("overlay").style.display = "none";
+            document.getElementById("reactionDescInfoDiv").style.paddingBottom = "20px";
+        })
+
+        socket.on('response_back', function(data){
+            console.log(data);
+            //console.log(data["response"]["choices"][0]["message"]["content"]);
+            //console.log(data["mol_weight"]);
+            //console.log(data["num_atoms"]);
+            //console.log(data["num_rings"]);
+            //console.log(data["mol_image"]);
+            if (data["type"] == "compound"){
+                document.body.style.overflow = "scroll";
+                document.getElementById('compoundDiv').classList.remove("displayNone");
+                
+                document.getElementById("reaction1TP").style.display = "none";
+                document.getElementById("reaction2TP").style.display = "none";
+                document.getElementById("reaction3TP").style.display = "none";
+
+                molName.textContent=data["mol_name_cs"];
+                if (data["mol_image"] == "unknown") {
+                    molImage.setAttribute('src', "{{ url_for('static', filename='images/unknown.jpg') }}");
+                } 
+                else {
+                    molImage.setAttribute('data-smiles', data["mol_image"]);
+                    molImage.setAttribute('data-smiles-options', "{ 'terminalCarbons': true, 'compactDrawing': false,'scale':5}");
+                    SmiDrawer.apply();
+                }
+                molWeight.textContent=data["mol_weight"];
+                molNumAtoms.textContent=data["num_atoms"];
+                molNumRings.textContent=data["num_rings"];
+                molBoilingPoint.textContent=data["mol_boiling_point"];
+                molMeltingPoint.textContent=data["mol_melting_point"];
+                molDescription.textContent=data["mol_description"];
+
+                paid_features = localStorage.getItem("paid");
+                if (paid_features == "true") {
+                    document.getElementById("paidFeatureTP").style.display = "none";
+                    document.getElementById("paidFeatureLockTP").style.display = "none";
+                    const collection = document.getElementsByClassName("reactionMoreDivTP");
+                    for (let i = 0; i < collection.length; i++) {
+                        collection[i].style.display = "block";
+                    }
+                    socket.emit("moreInfoRTP", data["mol_data"]);
+                }
+                else {
+                    document.getElementById("paidFeatureTP").style.display = "block";
+                    document.getElementById("paidFeatureLockTP").style.display = "block";
+                    const collection = document.getElementsByClassName("reactionMoreDivTP");
+                    for (let i = 0; i < collection.length; i++) {
+                        collection[i].style.display = "none";
+                    }
+                }
+                socket.emit("moreNamesTP", data["mol_data"]);
+                socket.emit("moreSafetyTP", data["mol_data"]);
+                socket.emit("moreUsesTP", data["mol_name_en"]);
+
+                setTimeout(function(){
+                    document.getElementById("feedback").classList.add("scaleInAn");
+                    document.getElementById("feedback").style.display = "block";
+                }, 6500);
+            }
+
+            if (data["type"] == "reaction"){
+                document.body.style.overflow = "scroll";
+                document.getElementById('reactionDiv').classList.remove("displayNone");
+
+                data["mol_name_cs"].forEach((element, index, array) => {
+                    console.log(element);
+                    if(element== "="){
+                        const equal = document.createElement("span");
+                        equal.textContent= "↓";
+                        equal.classList.add("symbol")
+                        document.getElementById("reactionDataDiv").appendChild(equal);
+                        console.log("=")
+                    }
+                    else {
+                        const compoundDiv = document.createElement("div");
+                        compoundDiv.style.display = "grid";
+                        compoundDiv.onclick = function() {moreInfo(data["mol_data"][index])};
+                        document.getElementById("reactionDataDiv").appendChild(compoundDiv);
+                        const img = document.createElement("img");
+                        img.style.objectFit = "contain";
+                        if (data["mol_image"][index] == "unknown") {
+                            img.setAttribute('src', "{{ url_for('static', filename='images/unknown.jpg') }}");
+                        } 
+                        else {
+                            img.setAttribute('data-smiles', data["mol_image"][index]);
+                            img.setAttribute('data-smiles-options', "{ 'terminalCarbons': true, 'compactDrawing': false ,'scale':5}");
+                        
+                        }
+                        
+                        compoundDiv.appendChild(img);
+                        console.log(element)
+
+                        const sp = document.createElement("span");
+                        sp.textContent= element;
+                        compoundDiv.appendChild(sp);
+                                                
+                        if(data["mol_name_cs"][index+1] != "=") {
+                            const plus = document.createElement("span");
+                            plus.textContent="+";
+                            plus.classList.add("symbol");
+                            document.getElementById("reactionDataDiv").appendChild(plus);
+                            console.log("+")
+                            
+                        }
+                    }
+                    
+                })
+                SmiDrawer.apply();
+                $('#reactionDataDiv').children().last().remove();
+                setTimeout(function(){
+                    document.getElementById("feedback").classList.add("scaleInAn");
+                    document.getElementById("feedback").style.display = "block";
+                }, 6500);
+
+            }
+
+            if (data["type"] == "solving reaction"){
+                document.body.style.overflow = "scroll";
+                document.getElementById('solvingReactionDiv').classList.remove("displayNone");
+                
+                paid_features = localStorage.getItem("paid");
+                if (paid_features == "true") {
+                    document.getElementById("reactionDescPaid").style.display = "none";
+                    document.getElementById("reactionDesc").onclick = function() {reactionDesc(data["mol_name_cs"])};
+                }
+                else {
+                    document.getElementById("reactionDescPaid").style.display = "block";
+                    document.getElementById("reactionDesc").onclick = function() {paypalOpen()};
+                }
+                
+                console.log(data["mol_name_cs"])
+
+                data["mol_name_cs"].forEach((element, index, array) => {
+                    console.log(element);
+                    if(element== "="){
+                        const equal = document.createElement("span");
+                        equal.textContent= "↓";
+                        equal.classList.add("symbol")
+                        document.getElementById("solvingReactionDataDiv").appendChild(equal);
+                        console.log("=")
+                    }
+                    else {
+                        const compoundDiv = document.createElement("div");
+                        compoundDiv.classList.add("solvingReactionDataDiv")
+                        compoundDiv.onclick = function() {moreInfo(data["mol_data"][index])};
+                        document.getElementById("solvingReactionDataDiv").appendChild(compoundDiv);
+
+                        const count = document.createElement("span");
+                        count.textContent= data["mol_count"][index];
+                        compoundDiv.appendChild(count);
+
+                        const img = document.createElement("img");
+                        img.style.objectFit = "contain";
+                        if (data["mol_image"][index] == "unknown") {
+                            img.setAttribute('src', "{{ url_for('static', filename='images/unknown.jpg') }}");
+                        } 
+                        else {
+                            img.setAttribute('data-smiles', data["mol_image"][index]);
+                            img.setAttribute('data-smiles-options', "{ 'terminalCarbons': true, 'compactDrawing': false,'scale':5}");
+                        
+                        }
+
+                        compoundDiv.appendChild(img);
+                        console.log(element)
+
+                        const sp = document.createElement("span");
+                        sp.textContent= element;
+                        document.getElementById("solvingReactionDataDiv").appendChild(sp);
+                                                
+                        if(data["mol_name_cs"][index+1] != "=") {
+                            const plus = document.createElement("span");
+                            plus.textContent="+";
+                            plus.classList.add("symbol");
+                            document.getElementById("solvingReactionDataDiv").appendChild(plus);
+                            console.log("+")
+                        }
+                    }
+                    
+                })
+                SmiDrawer.apply();
+                $('#solvingReactionDataDiv').children().last().remove();
+                setTimeout(function(){
+                    document.getElementById("feedback").classList.add("scaleInAn");
+                    document.getElementById("feedback").style.display = "block";
+                }, 6500);
+
+            }
+
+            if (data["type"] == "error"){
+                document.body.style.overflow = "scroll";
+                document.getElementById('errorDiv').classList.remove("displayNone");
+                errorName.textContent=data["error_name"] + " Zkuste to znovu!";
+                document.getElementById("overlay").style.display = "none";
+            }
+            //var pageHeight = $(document).height() + 1000;
+            //document.getElementById("windowHeight").style.height = pageHeight+"px";
+            document.getElementById("overlay").style.display = "none";
+            
+        });
+
+        function moreInfo(compound_name) {
+            yMargin = event.clientY - 300
+            document.getElementById("moreInfoY").style.marginTop = "80px";
+            //console.log(event.clientY);
+            document.getElementById("moreInfo").style.display = "block";
+            document.getElementById("moreInfo").classList.add("fadeInAn")
+            document.getElementById("moreInfoDiv").classList.add("scaleInAn")
+            document.getElementById("reaction1TP").style.display = "none";
+            document.getElementById("moreInfoCB").disabled = true;
+
+            socket.emit('moreInfo', compound_name);
+            socket.emit('moreNamesMI', compound_name);
+            socket.emit('moreSafetyMI', compound_name);
+        }
+
+        function moreInfoSearch(compound_name) {
+            //yMargin = event.clientY - 300
+            document.getElementById("moreInfoSearchY").style.marginTop = "80px";
+            //console.log(event.clientY);
+            document.getElementById("moreInfoSearch").style.display = "block";
+            document.getElementById("moreInfoSearch").classList.add("fadeInAn")
+            document.getElementById("moreInfoSearchDiv").classList.add("scaleInAn")
+            
+            document.getElementById("moreInfoSearchCB").disabled = true;
+
+            document.getElementById("reaction1").style.display = "none";
+            document.getElementById("reaction2").style.display = "none";
+            document.getElementById("reaction3").style.display = "none";
+            document.getElementById("reaction1").disabled = true;
+            document.getElementById("reaction2").disabled = true;
+            document.getElementById("reaction3").disabled = true;
+            if (document.getElementById("molAtomNumberS").textContent == "") {
+                const collection = document.getElementsByClassName("molPeriodicInfoDiv");
+                for (let i = 0; i < collection.length; i++) {
+                    collection[i].style.display = "none";
+                }
+            }
+            //document.getElementById("molAtomNumberS").textContent = data["element_index"]
+            socket.emit('moreInfoS', compound_name);
+            socket.emit("moreNamesS", compound_name);
+            socket.emit("moreSafetyS", compound_name);
+            socket.emit("moreUsesS", compound_name);
+            paid_features = localStorage.getItem("paid");
+            if (paid_features == "true") {
+                document.getElementById("paidFeatureMIS").style.display = "none";
+                document.getElementById("paidFeatureLockMIS").style.display = "none";
+                const collection = document.getElementsByClassName("reactionMoreDiv");
+                for (let i = 0; i < collection.length; i++) {
+                    collection[i].style.display = "block";
+                }
+                socket.emit('moreInfoRS', compound_name);
+            }
+            else {
+                document.getElementById("paidFeatureMIS").style.display = "block";
+                document.getElementById("paidFeatureLockMIS").style.display = "block";
+                const collection = document.getElementsByClassName("reactionMoreDiv");
+                for (let i = 0; i < collection.length; i++) {
+                    collection[i].style.display = "none";
+                }
+            }
+        }
+
+        function imageMoreReaction(reaction_list) {
+            document.getElementById("moreInfoSearchYR").style.marginTop = "80px";
+            //console.log(event.clientY);
+            document.getElementById("moreInfoSearchReaction").style.display = "block";
+            document.getElementById("moreInfoSearchReaction").classList.add("fadeInAn")
+            document.getElementById("moreInfoSearchDivR").classList.add("scaleInAn")
+            document.getElementById("moreInfoSearchDivR").style.paddingBottom = "900px";
+            document.getElementById("moreInfoSearchReactionCB").disabled = true;
+            
+
+            setTimeout(function(){
+                document.getElementById("overlay").style.display = "block";
+            }, 1000);
+            
+            socket.emit('imageMoreReaction', reaction_list);
+        }
+
+        function closeMoreInfoSearch(){
+            document.getElementById("moreInfoSearch").classList.remove("fadeInAn")
+            document.getElementById("moreInfoSearchDiv").classList.remove("scaleInAn")
+            document.getElementById("moreInfoSearch").classList.add("fadeOutAn")
+            document.getElementById("moreInfoSearchDiv").classList.add("scaleOutAn")
+            setTimeout(function(){
+                document.getElementById("moreInfoSearch").style.display = "none";
+                document.getElementById("moreInfoSearch").classList.remove("fadeOutAn")
+                document.getElementById("moreInfoSearchDiv").classList.remove("scaleOutAn")
+                molWeightS.textContent="";
+                molNumAtomsS.textContent="";
+                molNumRingsS.textContent="";
+                molNameS.textContent="";
+                molBoilingPointS.textContent="";
+                molMeltingPointS.textContent="";
+                molDescriptionS.textContent="";
+                molAtomNumberS.textContent="";
+                molElectronConfigS.textContent="";
+
+                molWeightS.style.width = "auto";
+                molNumAtomsS.style.width = "auto";
+                molNumRingsS.style.width = "auto";
+                molBoilingPointS.style.width = "auto";
+                molMeltingPointS.style.width = "auto";
+                molDescriptionS.style.width = "auto";
+
+                document.getElementById("moreNamesDotsS").style.display = "flex";
+                document.getElementById("moreSafetyDotsS").style.display = "flex";
+                document.getElementById("moreImagesBtn").style.display = "none";
+                document.getElementById("usesDotsS").style.display = "flex";
+                document.getElementById("moreImagesDiv").classList.remove("flexImages");
+                document.getElementById("moreImagesDiv").classList.add("flexCenter");
+                molMoreNamesS.textContent="";
+                const collection = document.getElementsByClassName("reactionDots");
+                for (let i = 0; i < collection.length; i++) {
+                    collection[i].style.display = "flex";
+                }
+
+                const collection2 = document.getElementsByClassName("moreInfoDotsS");
+                for (let i = 0; i < collection2.length; i++) {
+                    collection2[i].style.display = "flex";
+                }
+
+                document.getElementById("noReaction").style.display = "block";
+                const collection3 = document.getElementsByClassName("reactionMoreDiv");
+                for (let i = 0; i < collection3.length; i++) {
+                    collection3[i].style.display = "block";
+                }
+
+                const myNode = document.getElementById("moreSafetyDivS");
+                while (myNode.firstChild) {
+                    myNode.removeChild(myNode.lastChild);
+                }
+
+                const myNode2 = document.getElementById("usesS");
+                while (myNode2.firstChild) {
+                    myNode2.removeChild(myNode2.lastChild);
+                }
+
+                var parent = document.getElementById('moreImagesDiv');
+                var divs = parent.getElementsByTagName('div');
+                while (divs.length > 0) {
+                    parent.removeChild(divs[0]);
+                }
+                
+                document.getElementById("reaction1").style.display = "none"
+                document.getElementById("reaction2").style.display = "none"
+                document.getElementById("reaction3").style.display = "none"
+                molImageS.setAttribute('src', "{{ url_for('static', filename='images/unknown.jpg') }}");
+            
+            }, 1000);
+        }
+
+        function closeMoreInfoSearchReaction(){
+            document.getElementById("moreInfoSearchReaction").classList.remove("fadeInAn")
+            document.getElementById("moreInfoSearchDivR").classList.remove("scaleInAn")
+            document.getElementById("moreInfoSearchReaction").classList.add("fadeOutAn")
+            document.getElementById("moreInfoSearchDivR").classList.add("scaleOutAn")
+            setTimeout(function(){
+                document.getElementById("moreInfoSearchReaction").style.display = "none";
+                document.getElementById("moreInfoSearchReaction").classList.remove("fadeOutAn")
+                document.getElementById("moreInfoSearchDivR").classList.remove("scaleOutAn")
+                const myNode = document.getElementById("moreReactionSearch");
+                while (myNode.firstChild) {
+                    myNode.removeChild(myNode.lastChild);
+                }
+            }, 1000);
+            
+        }
+
+        function closeMoreInfo(){
+            document.getElementById("moreInfo").classList.remove("fadeInAn")
+            document.getElementById("moreInfoDiv").classList.remove("scaleInAn")
+            document.getElementById("moreInfo").classList.add("fadeOutAn")
+            document.getElementById("moreInfoDiv").classList.add("scaleOutAn")
+            setTimeout(function(){
+                document.getElementById("moreInfo").style.display = "none";
+                document.getElementById("moreInfo").classList.remove("fadeOutAn")
+                document.getElementById("moreInfoDiv").classList.remove("scaleOutAn")
+                const collection = document.getElementsByClassName("moreInfoDots");
+                for (let i = 0; i < collection.length; i++) {
+                    collection[i].style.display = "flex";
+                }
+                document.getElementById("moreInfoDotsNames").style.display = "flex";
+                document.getElementById("moreSafetyDots").style.display = "flex";
+                molMoreNamesMI.textContent="";
+                molWeightMI.textContent="";
+                molNumAtomsMI.textContent="";
+                molNumRingsMI.textContent="";
+                molBoilingPointMI.textContent="";
+                molMeltingPointMI.textContent="";
+                molDescriptionMI.textContent="";
+                
+                molWeightMI.style.width = "auto";
+                molNumAtomsMI.style.width = "auto";
+                molNumRingsMI.style.width = "auto";
+                molBoilingPointMI.style.width = "auto";
+                molMeltingPointMI.style.width = "auto";
+                molDescriptionMI.style.width = "auto";
+                
+                const myNode = document.getElementById("moreSafetyDiv");
+                while (myNode.firstChild) {
+                    myNode.removeChild(myNode.lastChild);
+                }
+            }, 1000);
+        }
+
+
+        document.getElementById("bottomBar2").addEventListener("animationend", function() {
+            document.getElementById("bottomBar2").style.marginTop = "-60px"
+            document.getElementById("canvasDiv").style.display = "none";
+            document.getElementById("bottomBar1").style.display = "none";
+            //document.getElementById("reload").classList.add(scaleInAn);
+            document.getElementById("reload").style.display = "block";
+            if (document.getElementById("searchDiv").classList.contains("displayNone") == true){
+            document.getElementById("overlay").style.display = "block";}
+
+            if (video.classList.contains("displayNone") == false){
+                const mediaStream = video.srcObject;
+                const tracks = mediaStream.getTracks();
+                tracks.forEach(track => track.stop());
+                video.classList.add("displayNone");
+            }
+
+        }, false);
+
+        function search() {
+            document.getElementById("bottomBar2").classList.add("slideUpAn");
+            document.getElementById("searchDiv").classList.remove("displayNone");
+            document.getElementById("searchDesignDivParent").style.display = "none";
+            setTimeout(function(){
+                document.getElementById("feedback").classList.add("scaleInAn");
+                document.getElementById("feedback").style.display = "block";
+            }, 10500);
+            
+        }
+
+        function showPeriodicTable() {
+            const myNode = document.getElementById("searchDataDiv");
+            while (myNode.firstChild) {
+                myNode.removeChild(myNode.lastChild);
+            }
+            document.getElementById("searchDesignDivParent").style.display = "none";
+            if (document.getElementById("periodicTable").style.display == "none" && document.getElementById("pTList").style.display == "none") {
+                document.body.style.overflow = "scroll";
+                document.getElementById("periodicTable").style.display = "block";
+                document.getElementById("pTShowType").style.display = "grid";
+                document.getElementById("pTList").style.display = "none";
+                document.getElementById("periodicTableBtn").style.backgroundColor = "white";
+                document.getElementById("periodicTableBtn").style.color = "black";
+                document.getElementById("periodicTableBtn").style.boxShadow = "0px 0px 73px 0px #757575 inset"
+                document.getElementById("periodicTableBtn").style.border = "none"
+                document.getElementById("periodicTableBtn").style.padding = "26px"
+                document.getElementById("periodicTableBtnSvg").setAttribute("fill", "black");
+                const url = "{{ url_for('static', filename='files/periodic_table.json') }}"
+                if( $('#pTElement1').is(':empty') ) {
+                    fetch(url)
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error('Network response was not ok ' + response.statusText);
+                            }
+                            return response.json();
+                        })
+                        .then(data => {
+                            // Perform an action for each element in the JSON array
+                            data["Table"]["Row"].forEach((element, index, array) => {
+                                newIndex = index+1;
+                                elementIndex = "pTElement" + newIndex;
+                                const flexDiv = document.createElement("div");
+                                flexDiv.classList.add("textCenter");
+                                elementDiv = document.getElementById(elementIndex)
+                                elementDiv.appendChild(flexDiv);
+
+                                const flexDiv2 = document.createElement("div");
+                                flexDiv2.classList.add("pTListDiv");
+                                document.getElementById("pTList").appendChild(flexDiv2);
+
+                                const gridDiv1 = document.createElement("div");
+                                flexDiv2.appendChild(gridDiv1);
+
+                                const sub2 = document.createElement("sub");
+                                sub2.textContent= element["Cell"][0];
+                                gridDiv1.appendChild(sub2); 
+
+                                const sp2 = document.createElement("span");
+                                sp2.textContent= element["Cell"][1];
+                                gridDiv1.appendChild(sp2); 
+
+                                const gridDiv2 = document.createElement("div");
+                                flexDiv2.appendChild(gridDiv2);
+
+                                const par3 = document.createElement("p");
+                                par3.textContent= element["Cell"][2];
+                                gridDiv2.appendChild(par3);
+
+                                const par4 = document.createElement("p");
+                                par4.textContent= "Atomové číslo: " + element["Cell"][3].toString();
+                                gridDiv2.appendChild(par4);
+
+                                if (element["Cell"][15] == "Nonmetal") {
+                                    elementDiv.style.boxShadow = "0px 0px 73px 0px #a5ff8a inset";
+                                    flexDiv2.style.boxShadow = "0px 0px 73px 0px #a5ff8a inset";
+                                }
+                                else if (element["Cell"][15] == "Noble gas") {
+                                    elementDiv.style.boxShadow = "0px 0px 73px 0px #fdff80 inset";
+                                    flexDiv2.style.boxShadow = "0px 0px 73px 0px #fdff80 inset";
+                                }
+                                else if (element["Cell"][15] == "Alkali metal") {
+                                    elementDiv.style.boxShadow = "0px 0px 73px 0px #ff8080 inset";
+                                    flexDiv2.style.boxShadow = "0px 0px 73px 0px #ff8080 inset";
+                                }
+                                else if (element["Cell"][15] == "Alkaline earth metal") {
+                                    elementDiv.style.boxShadow = "0px 0px 73px 0px #80c6ff inset";
+                                    flexDiv2.style.boxShadow = "0px 0px 73px 0px #80c6ff inset";
+                                }
+                                else if (element["Cell"][15] == "Metalloid") {
+                                    elementDiv.style.boxShadow = "0px 0px 73px 0px #80fff4 inset";
+                                    flexDiv2.style.boxShadow = "0px 0px 73px 0px #80fff4 inset";
+                                }
+                                else if (element["Cell"][15] == "Halogen") {
+                                    elementDiv.style.boxShadow = "0px 0px 73px 0px #ff80ca inset";
+                                    flexDiv2.style.boxShadow = "0px 0px 73px 0px #ff80ca inset";
+                                }
+                                else if (element["Cell"][15] == "Transition metal") {
+                                    elementDiv.style.boxShadow = "0px 0px 73px 0px #cc80ff inset";
+                                    flexDiv2.style.boxShadow = "0px 0px 73px 0px #cc80ff inset";
+                                }
+                                else if (element["Cell"][15] == "Post-transition metal") {
+                                    elementDiv.style.boxShadow = "0px 0px 73px 0px #ffbd80 inset";
+                                    flexDiv2.style.boxShadow = "0px 0px 73px 0px #ffbd80 inset";
+                                }
+                                else {
+                                    elementDiv.style.boxShadow = "0px 0px 73px 0px #a9a9a9 inset";
+                                    flexDiv2.style.boxShadow = "0px 0px 73px 0px #a9a9a9 inset";
+                                }
+
+                                const br = document.createElement("br");
+                                flexDiv.appendChild(br);
+
+                                const sub = document.createElement("sub");
+                                sub.textContent= element["Cell"][0];
+                                flexDiv.appendChild(sub); 
+                                
+                                const sp = document.createElement("span");
+                                sp.textContent= element["Cell"][1];
+                                flexDiv.appendChild(sp); 
+
+                                const par = document.createElement("p");
+                                par.textContent= element["Cell"][2];
+                                par.style.padding = "0px";
+                                par.style.margin = "0px";
+                                flexDiv.appendChild(par);
+
+                                const par2 = document.createElement("p");
+                                par2.textContent= element["Cell"][3].toString();
+                                par2.style.padding = "0px";
+                                par2.style.margin = "0px";
+                                flexDiv.appendChild(par2);
+                                
+                                elementDiv.onclick = function() {periodicTableMI(element["Cell"][2], element["Cell"])};
+                                flexDiv2.onclick = function() {periodicTableMI(element["Cell"][2], element["Cell"])};
+                                //console.log("pTElement" + index)
+                            });
+                            //console.log(data)
+                        })
+                        .catch(error => {
+                            console.error('Error fetching the JSON data:', error);
+                        });
+                    }
+            }
+
+            else {
+                document.getElementById("periodicTable").style.display = "none";
+                document.getElementById("pTShowType").style.display = "none";
+                document.getElementById("windowHeight").style.height = "5000px";
+                document.getElementById("pTList").style.display = "none";
+                document.getElementById("periodicTableBtn").style.backgroundColor = "transparent";
+                document.getElementById("periodicTableBtn").style.color = "white";
+                document.getElementById("periodicTableBtnSvg").setAttribute("fill", "white");
+                document.getElementById("periodicTableBtn").style.boxShadow = "none"
+                document.getElementById("periodicTableBtn").style.border = "6px solid white"
+                document.getElementById("periodicTableBtn").style.padding = "20px"
+            }
+            
+        }
+
+        function periodicTableMI(element, elementInfo) {
+            socket.emit('periodicTableMI', element, elementInfo);
+            //document.getElementById("periodicTable").style.display = "none";
+            //document.getElementById("overlay").style.display = "block";
+            document.getElementById("moreInfoSearchY").style.marginTop = "80px";
+            const collection8 = document.getElementsByClassName("molPeriodicInfoDiv");
+                for (let i = 0; i < collection8.length; i++) {
+                    collection8[i].style.display = "block";
+            }
+            
+            document.getElementById("molAtomNumberS").textContent = elementInfo[0]
+            document.getElementById("molElectronConfigS").textContent = elementInfo[5]
+
+            document.getElementById("moreInfoSearchCB").disabled = true;
+
+            //console.log(event.clientY);
+            document.getElementById("moreInfoSearch").style.display = "block";
+            document.getElementById("moreInfoSearch").classList.add("fadeInAn")
+            document.getElementById("moreInfoSearchDiv").classList.add("scaleInAn")
+            document.getElementById("reaction1").style.display = "none";
+            document.getElementById("reaction2").style.display = "none";
+            document.getElementById("reaction3").style.display = "none";
+            document.getElementById("reaction1").disabled = true;
+            document.getElementById("reaction2").disabled = true;
+            document.getElementById("reaction3").disabled = true;
+            paid_features = localStorage.getItem("paid");
+            if (paid_features == "true") {
+                document.getElementById("paidFeatureMIS").style.display = "none";
+                document.getElementById("paidFeatureLockMIS").style.display = "none";
+                const collection = document.getElementsByClassName("reactionMoreDiv");
+                for (let i = 0; i < collection.length; i++) {
+                    collection[i].style.display = "block";
+                }
+                socket.emit('moreInfoRS', compound_name);
+            }
+            else {
+                document.getElementById("paidFeatureMIS").style.display = "block";
+                document.getElementById("paidFeatureLockMIS").style.display = "block";
+                const collection = document.getElementsByClassName("reactionMoreDiv");
+                for (let i = 0; i < collection.length; i++) {
+                    collection[i].style.display = "none";
+                }
+            }
+        }
+
+        const targetNode = document.querySelector('#searchBox');
+        let prevValue = targetNode.value;
+        const delay = 2000; // 2 seconds
+
+        function handleInputChange() {
+            if (targetNode.value !== prevValue) {
+                document.getElementById("periodicTable").style.display = "none";
+                document.getElementById("pTShowType").style.display = "none";
+                document.getElementById("windowHeight").style.height = "5000px";
+                document.getElementById("pTList").style.display = "none";
+                document.getElementById("periodicTableBtn").style.backgroundColor = "transparent";
+                document.getElementById("periodicTableBtn").style.color = "white";
+                document.getElementById("periodicTableBtnSvg").setAttribute("fill", "white");
+                document.getElementById("periodicTableBtn").style.boxShadow = "none"
+                document.getElementById("periodicTableBtn").style.border = "6px solid white"
+                document.getElementById("periodicTableBtn").style.padding = "20px"
+
+                
+                document.getElementById("overlay").style.display = "block";
+                console.log('Value changed:', targetNode.value);
+                // Perform your desired action here
+                const myNode = document.getElementById("searchDataDiv");
+                while (myNode.firstChild) {
+                    myNode.removeChild(myNode.lastChild);
+                }
+                document.getElementById("searchDesignDivParent").style.display = "none";
+                console.log(document.getElementById("searchBox").value)
+                
+                if (targetNode.value == "") {document.getElementById("overlay").style.display = "none";}
+                else {socket.emit('search', document.getElementById("searchBox").value);}
+            }
+            // Update the previous value
+            prevValue = targetNode.value;
+        }
+
+        // Add an event listener for the input event
+        targetNode.addEventListener('input', () => {
+            clearTimeout(targetNode.timer);
+            document.getElementById("periodicTable").style.display = "none";
+            document.getElementById("pTShowType").style.display = "none";
+            document.getElementById("windowHeight").style.height = "5000px";
+            document.getElementById("pTList").style.display = "none";
+            document.getElementById("periodicTableBtn").style.backgroundColor = "transparent";
+            document.getElementById("periodicTableBtn").style.color = "white";
+            document.getElementById("periodicTableBtnSvg").setAttribute("fill", "white");
+            document.getElementById("periodicTableBtn").style.boxShadow = "none"
+            document.getElementById("periodicTableBtn").style.border = "6px solid white"
+            document.getElementById("periodicTableBtn").style.padding = "20px"
+            document.getElementById("searchDesignDivParent").style.display = "none";
+            document.getElementById("overlay").style.display = "block";
+            targetNode.timer = setTimeout(handleInputChange, delay);
+        });
+
+        function likeSend() {
+            socket.emit('like');
+            party.sparkles(document.getElementById("likes"), {
+                count: party.variation.range(20, 40),
+                size: party.variation.range(0.5, 1.5),
+                velocity: party.variation.range(1, 6),
+                angularVelocity: party.variation.range(0, 10),
+                shapes: ['circle'],
+                color: party.Color.fromHex("#ffffff")
+            });
+            document.getElementById("likeBtn").classList.add("fadeOut");
+            document.getElementById("dislikeBtn").classList.add("fadeOut");
+            
+            setTimeout(function(){
+                document.getElementById("likeBtn").style.display = "none";
+                document.getElementById("dislikeBtn").style.display = "none";
+                document.getElementById("thanksBtn").style.display = "flex";
+                document.getElementById("thanksBtn").classList.add("fadeIn");
+            }, 500);
+
+            setTimeout(function(){
+                document.getElementById("feedback").classList.add("scaleOutAn");
+            }, 2000);
+
+            setTimeout(function(){
+                document.getElementById("feedback").style.display = "none";
+            }, 2800);
+
+        }
+
+        function dislikeSend() {
+            socket.emit("dislike");
+            party.sparkles(document.getElementById("likes"), {
+                count: party.variation.range(20, 40),
+                size: party.variation.range(0.5, 1.5),
+                velocity: party.variation.range(1, 6),
+                angularVelocity: party.variation.range(0, 10),
+                shapes: ['circle'],
+                color: party.Color.fromHex("#ffffff")
+            });
+            document.getElementById("likeBtn").classList.add("fadeOut");
+            document.getElementById("dislikeBtn").classList.add("fadeOut");
+            
+            setTimeout(function(){
+                document.getElementById("likeBtn").style.display = "none";
+                document.getElementById("dislikeBtn").style.display = "none";
+                document.getElementById("thanksBtn").style.display = "flex";
+                document.getElementById("thanksBtn").classList.add("fadeIn");
+            }, 500);
+
+            setTimeout(function(){
+                document.getElementById("feedback").classList.add("scaleOutAn");
+            }, 2000);
+
+            setTimeout(function(){
+                document.getElementById("feedback").style.display = "none";
+            }, 2800);
+
+        }
+
+        function reloadVideo() {
+            //TODO: better reload
+            /*
+            try {
+                cropper.destroy()
+            }
+            catch(err) {
+                console.log(err)
+            }
+            document.getElementById("bottomBar2").style.marginTop = "0px"
+            //document.getElementById("canvasDiv").style.display = "block";
+            document.getElementById("bottomBar1").style.display = "flex";
+            
+            //document.getElementById('canvasDiv').classList.remove("displayNone");
+            document.getElementById('acceptBtn').classList.add("displayNone");
+            document.getElementById('reloadBtn').classList.add("displayNone");
+            document.getElementById('takePhotoBtn').classList.remove("displayNone");
+            document.getElementById('searchBtn').classList.remove("displayNone");
+
+            document.getElementById('compoundDiv').classList.add("displayNone");
+            document.getElementById('reactionDiv').classList.add("displayNone");
+            document.getElementById('solvingReactionDiv').classList.add("displayNone");
+            document.getElementById('errorDiv').classList.add("displayNone");
+            document.body.scrollTop = 0;
+            document.getElementById("usesDotsTP").style.display = "flex";
+            const myNode = document.getElementById("usesTP");
+            while (myNode.firstChild) {
+                myNode.removeChild(myNode.lastChild);
+            }
+
+            document.getElementById("molSafetyDots").style.display = "flex";
+            const myNode2 = document.getElementById("molSafetyDiv");
+            while (myNode2.firstChild) {
+                myNode2.removeChild(myNode2.lastChild);
+            }
+            document.getElementById("moreNamesDotsTP").style.display = "none";
+            molNameMoreTP.textContent="";
+
+            start()
+            */
+           window.location.reload();
+        }
+
+        function moreImages() {
+            socket.emit("moreImages", molNameS.textContent);
+            document.getElementById("moreImagesBtn").style.display = "none";
+        }
+
+        function moreImagesTP() {
+            socket.emit("moreImagesTP", molName.textContent);
+            document.getElementById("moreImagesBtnTP").style.display = "none";
+        }
+
+        function showPTGrid() {
+            document.getElementById("periodicTable").style.display = "block";
+            document.getElementById("pTList").style.display = "none";
+            document.getElementById("windowHeight").style.height = "5000px";
+        }
+
+        function showPTList() {
+            document.getElementById("periodicTable").style.display = "none";
+            document.getElementById("pTList").style.display = "block";
+            document.getElementById("windowHeight").style.height = "29000px";
+        }
+
+        function reactionDesc(reactionData) {
+            document.getElementById("reactionDescInfoCB").disabled = true;
+            document.getElementById("reactionDescInfoY").style.marginTop = "80px";
+            //console.log(event.clientY);
+            document.getElementById("reactionDescInfo").style.display = "block";
+            document.getElementById("reactionDescInfo").classList.add("fadeInAn")
+            document.getElementById("reactionDescInfoDiv").classList.add("scaleInAn")
+            document.getElementById("reactionDescInfoDiv").style.paddingBottom = "900px";
+            
+
+            setTimeout(function(){
+                document.getElementById("overlay").style.display = "block";
+            }, 1000);
+            
+            socket.emit('reactionDesc', reactionData);
+        }
+
+        function closeReactionDescInfo() {
+            document.getElementById("reactionDescInfo").classList.remove("fadeInAn")
+            document.getElementById("reactionDescInfoDiv").classList.remove("scaleInAn")
+            document.getElementById("reactionDescInfo").classList.add("fadeOutAn")
+            document.getElementById("reactionDescInfoDiv").classList.add("scaleOutAn")
+            setTimeout(function(){
+                document.getElementById("reactionDescInfo").style.display = "none";
+                document.getElementById("reactionDescInfo").classList.remove("fadeOutAn")
+                document.getElementById("reactionDescInfoDiv").classList.remove("scaleOutAn")
+                document.getElementById("reactionDescData").innerHTML = "";
+
+            }, 1000);
+
+        }
+
+        function closeChemBot() {
+            document.getElementById("chemBot").classList.remove("fadeInAn")
+            document.getElementById("chemBotDiv").classList.remove("scaleInAn")
+            document.getElementById("chemBot").classList.add("fadeOutAn")
+            document.getElementById("chemBotDiv").classList.add("scaleOutAn")
+            setTimeout(function(){
+                document.getElementById("chemBot").style.display = "none";
+                document.getElementById("chemBot").classList.remove("fadeOutAn")
+                document.getElementById("chemBotDiv").classList.remove("scaleOutAn")
+                chemBotReset();
+            }, 1000);
+        }
+
+        function chemBotOpen() {
+            document.getElementById("chemBot").classList.add("fadeInAn")
+            document.getElementById("chemBotDiv").classList.add("scaleInAn")
+            document.getElementById("chemBot").style.display = "block";
+        }
+
+        function sendChemBot() {
+            document.getElementById("chemBotDots").style.display = "flex";
+            document.getElementById("chemBotMessage").style.display = "none";
+            socket.emit('chemBotGPT', document.getElementById("chemBotInput").value);
+            document.getElementById("chemBotInput").value = "";
+            document.getElementById("chemBotInputDiv").style.display = "none";
+            
+        }
+
+        function chemBotReset() {
+            document.getElementById("chemBotMessage").style.display = "block";
+            document.getElementById("chemBotInputDiv").style.display = "flex";
+            document.getElementById("chemBotReloadDiv").style.display = "none";
+            document.getElementById("chemBotLoader").classList.remove("chemBotSmallerAn");
+            document.getElementById("chemBotLoader").style.height = "200px";
+            document.getElementById("chemBotLoader").style.paddingTop = "200px";
+            document.getElementById("chemBotGPT").innerHTML = "";
+        }
+        
+        function flashMessage(message) {
+            document.getElementById("flashMessageText").textContent = message;
+            document.getElementById("flashMessage").style.display = "flex";
+            document.getElementById("flashMessage").classList.add("scaleInAn")
+            setTimeout(function(){
+                document.getElementById("flashMessage").classList.remove("scaleInAn")
+                document.getElementById("flashMessage").classList.add("scaleOutAn");
+            }, 2000);
+            setTimeout(function(){
+                document.getElementById("flashMessage").style.display = "none";
+                document.getElementById("flashMessage").classList.remove("scaleOutAn")
+            }, 3000);
+        }
+
+        function paypalOpen() {
+            document.getElementById("flashMessageText").textContent = "Načítání ...";
+            document.getElementById("flashMessage").style.display = "flex";
+            document.getElementById("flashMessage").classList.add("scaleInAn")
+            setTimeout(function(){
+                document.getElementById("flashMessage").classList.remove("scaleInAn")
+                document.getElementById("flashMessage").classList.add("scaleOutAn");
+            }, 2000);
+            setTimeout(function(){
+                document.getElementById("flashMessage").style.display = "none";
+                document.getElementById("flashMessage").classList.remove("scaleOutAn")
+            }, 3000);
+            window.open('https://www.paypal.com/donate/?hosted_button_id=ZVPMCTX8TZRKS', '_blank');
+        }
+
+        function acceptDisclaimer() {
+            document.getElementById("disclaimerAcceptDiv").classList.add("scaleOutAn");
+            document.getElementById("disclaimerAccept").classList.add("fadeOut");
+
+            localStorage.setItem("disclaimer", "true");
+
+            setTimeout(function(){
+                document.getElementById("disclaimerAccept").style.display = "none";
+            }, 1000);
+            
+        }
+
+        disclaimer_features = localStorage.getItem("disclaimer");
+        if (disclaimer_features == "true") {
+            document.getElementById("disclaimerAccept").style.display = "none";
+        }
+        else {
+            document.getElementById("disclaimerAccept").style.display = "flex";
+        }
+
+        start();
+        
+    </script>
+
+ </body>
+
+</html>
+

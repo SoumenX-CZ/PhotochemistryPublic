@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="user-scalable=0"/>
+    <meta name="google-site-verification" content="RQaPpbf8SdwiqzUFZg0-9qgYAPf53gtBnWbSz9nxk64" />
+    <title>Photochemistry</title>
+    <link rel="stylesheet" type="text/css" href="static/css/start.css">
+    <link rel="icon" href="{{ url_for('static', filename='images/favicon.ico') }}">
+
+    <link rel="manifest" href="{{ url_for('static', filename='scripts/manifest.json') }}">  
+
+    <meta name="msapplication-TileColor" content="#ffffff">
+    <meta name="msapplication-TileImage" content="{{ url_for('static', filename='images/android-icon-144x144.png') }}">
+    <meta name="theme-color" content="#ffffff"> 
+
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-title" content="Photochemistry">
+    <link rel="apple-touch-icon" href="{{ url_for('static', filename='images/android-icon-72x72.png') }}" sizes="72x72">
+    <link rel="apple-touch-icon" href="{{ url_for('static', filename='images/android-icon-96x96.png') }}" sizes="96x96">
+    <link rel="apple-touch-icon" href="{{ url_for('static', filename='images/android-icon-128x128.png') }}" sizes="128x128">
+    <link rel="apple-touch-icon" href="{{ url_for('static', filename='images/android-icon-144x144.png') }}" sizes="144x144">
+    <link rel="apple-touch-icon" href="{{ url_for('static', filename='images/android-icon-152x152.png') }}" sizes="152x152">
+    <link rel="apple-touch-icon" href="{{ url_for('static', filename='images/android-icon-192x192.png') }}" sizes="192x192">
+    <link rel="apple-touch-icon" href="{{ url_for('static', filename='images/android-icon-384x384.png') }}" sizes="384x384">
+    <link rel="apple-touch-icon" href="{{ url_for('static', filename='images/android-icon-512x512.png') }}" sizes="512x512">
+
+</head>
+<body>
+    <div id="mainGridIOS">
+        <div id="aboutApp">
+            <div id="logo">
+                <div class="elipseTop"></div>
+                    <div class="bottomPart" id="windowHeight">
+                        <div class="flexCenter" id="bottomHead">
+                            <div>
+                                <span id="headlineBig">P</span><span id="headline">HOTO</span><span id="headlineBig">C</span><span id="headline">HEMISTRY</span>
+                            </div>
+                            <div id="controlLine"></div>
+
+                        </div>
+                        
+                        
+                    </div>
+                <div class="elipseBottom"></div>
+            </div>
+            <div class="stepDiv">
+                <span id="bigTxt">INSTALACE NA IOS</span>
+                <div id="line" class="flexCenter"></div>
+                <p class="basicText">1) Klikni v prohlížeči SAFARI na tlačítko "Sdílet"</p>
+                <img class="stepImage" src="{{ url_for('static', filename='images/shareButton.jpg') }}" style="text-align: center; border-radius: 20px;">
+                <p class="basicText">2) Sjeď trošku dolů a klikni na tlačítko "Přidat na plochu"</p>
+                <img class="stepImage" src="{{ url_for('static', filename='images/addButton.jpg') }}" style="text-align: center; border-radius: 20px;">
+                <p class="basicText">3) Pak už stačí kliknout nahoře na tlačítko "Přidat". A máte hotovo!</p>
+            </div>
+            </div>
+        <div>
+            <div id="btnBar">
+                <div class="btnBig" id="btnStart" style="width: 100%; margin-right: 0px;">
+                    <a href="{{ url_for('start') }}" class="aBig">A JE TO!</a>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <div id="mainGridFull">
+        <img style="-webkit-filter: invert(1);filter: invert(1); width: 150px; padding-bottom: 3px;" src="{{ url_for('static', filename='images/OpenAILogo.png') }}">
+        <img style="-webkit-filter: invert(1);filter: invert(1); width: 150px; padding-bottom: 10px;" src="{{ url_for('static', filename='images/RenderLogo.png') }}">
+        <img style="-webkit-filter: invert(1);filter: invert(1); width: 150px; padding-bottom: 2px;" src="{{ url_for('static', filename='images/PythonLogo.jpg') }}">
+        <img style="-webkit-filter: invert(1);filter: invert(1); height: 40px;" src="{{ url_for('static', filename='images/FlaskLogo.png') }}">
+    </div>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-GXT755RYYB"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+
+        gtag('config', 'G-GXT755RYYB');
+    </script>
+</body>
+</html>

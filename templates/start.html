@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="user-scalable=0"/>
+    <meta name="google-site-verification" content="RQaPpbf8SdwiqzUFZg0-9qgYAPf53gtBnWbSz9nxk64" />
+    <title>Photochemistry</title>
+    <link rel="stylesheet" type="text/css" href="static/css/start.css">
+    <link rel="icon" href="{{ url_for('static', filename='images/favicon.ico') }}">
+
+    <link rel="manifest" href="{{ url_for('static', filename='scripts/manifest.json') }}">  
+
+    <meta name="msapplication-TileColor" content="#ffffff">
+    <meta name="msapplication-TileImage" content="{{ url_for('static', filename='images/android-icon-144x144.png') }}">
+    <meta name="theme-color" content="#ffffff"> 
+
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-title" content="Photochemistry">
+    <link rel="apple-touch-icon" href="{{ url_for('static', filename='images/android-icon-72x72.png') }}" sizes="72x72">
+    <link rel="apple-touch-icon" href="{{ url_for('static', filename='images/android-icon-96x96.png') }}" sizes="96x96">
+    <link rel="apple-touch-icon" href="{{ url_for('static', filename='images/android-icon-128x128.png') }}" sizes="128x128">
+    <link rel="apple-touch-icon" href="{{ url_for('static', filename='images/android-icon-144x144.png') }}" sizes="144x144">
+    <link rel="apple-touch-icon" href="{{ url_for('static', filename='images/android-icon-152x152.png') }}" sizes="152x152">
+    <link rel="apple-touch-icon" href="{{ url_for('static', filename='images/android-icon-192x192.png') }}" sizes="192x192">
+    <link rel="apple-touch-icon" href="{{ url_for('static', filename='images/android-icon-384x384.png') }}" sizes="384x384">
+    <link rel="apple-touch-icon" href="{{ url_for('static', filename='images/android-icon-512x512.png') }}" sizes="512x512">
+
+</head>
+<body>
+    <div id="mainGrid">
+        <div id="aboutApp">
+            <div id="logo">
+                <div class="elipseTop"></div>
+                    <div class="bottomPart" id="windowHeight">
+                        <div class="flexCenter" id="bottomHead">
+                            <div>
+                                <span id="headlineBig">P</span><span id="headline">HOTO</span><span id="headlineBig">C</span><span id="headline">HEMISTRY</span>
+                            </div>
+                            <div id="controlLine"></div>
+
+                        </div>
+                        
+                        
+                    </div>
+                <div class="elipseBottom"></div>
+            </div>
+            <div id="aboutAppDiv">
+                <span id="bigTxt">O APLIKACI</span>
+                <div id="line" class="flexCenter"></div>
+                <p>Aplikace <span style="font-family: pastrami;">PHOTOCHEMISTRY</span> je revoluční nástroj, který přináší chemii přímo do vašich rukou. Tato mobilní aplikace využívá pokročilé technologie rozpoznávání obrazu a umělé inteligence k identifikaci chemických vzorců a poskytuje uživatelům okamžité informace o dané sloučenině. 
+                    <br><br>Stačí vyfotit chemický vzorec a aplikace vám okamžitě ukáže, jak se daná sloučenina jmenuje. Tato funkce je ideální pro studenty chemie, kteří se potřebují rychle naučit nové sloučeniny, nebo pro profesionály, kteří potřebují rychlý přehled. 
+                    <br>Kromě toho je aplikace schopna dovyřešit chemické rovnice a dokonce je i vyčíslit. Tato funkce je neocenitelná pro řešení složitých chemických problémů a ušetří uživatelům hodně času a úsilí. 
+                    <br><br>Aplikace <span style="font-family: pastrami;">PHOTOCHEMISTRY</span> je dostupná pro stažení na všech hlavních mobilních platformách. Začněte objevovat svět chemie s <span style="font-family: pastrami;">PHOTOCHEMISTRY</span> dnes!</p>
+            </div>
+            </div>
+        <div>
+            <div id="btnBar">
+                <div class="btnBig" id="btnStart">
+                    <a href="{{ url_for('index') }}" class="aBig">START</a>
+                </div>
+
+                <div class="btnBigOutline">
+                    <a href="https://play.google.com/store/apps/details?id=com.soumenx.photochemistry" class="aBig">ANDROID<svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" fill="white" class="bi bi-google-play" viewBox="0 0 16 16" style="margin-left: 20px;">
+                        <path d="M14.222 9.374c1.037-.61 1.037-2.137 0-2.748L11.528 5.04 8.32 8l3.207 2.96zm-3.595 2.116L7.583 8.68 1.03 14.73c.201 1.029 1.36 1.61 2.303 1.055zM1 13.396V2.603L6.846 8zM1.03 1.27l6.553 6.05 3.044-2.81L3.333.215C2.39-.341 1.231.24 1.03 1.27"/>
+                      </svg></a>
+                </div>
+                <div class="btnBigOutline">
+                    <a href="{{ url_for('ios') }}" class="aBig">IOS<svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" fill="white" class="bi bi-apple" viewBox="0 0 16 16" style="margin-left: 20px;">
+                        <path d="M11.182.008C11.148-.03 9.923.023 8.857 1.18c-1.066 1.156-.902 2.482-.878 2.516s1.52.087 2.475-1.258.762-2.391.728-2.43m3.314 11.733c-.048-.096-2.325-1.234-2.113-3.422s1.675-2.789 1.698-2.854-.597-.79-1.254-1.157a3.7 3.7 0 0 0-1.563-.434c-.108-.003-.483-.095-1.254.116-.508.139-1.653.589-1.968.607-.316.018-1.256-.522-2.267-.665-.647-.125-1.333.131-1.824.328-.49.196-1.422.754-2.074 2.237-.652 1.482-.311 3.83-.067 4.56s.625 1.924 1.273 2.796c.576.984 1.34 1.667 1.659 1.899s1.219.386 1.843.067c.502-.308 1.408-.485 1.766-.472.357.013 1.061.154 1.782.539.571.197 1.111.115 1.652-.105.541-.221 1.324-1.059 2.238-2.758q.52-1.185.473-1.282"/>
+                        <path d="M11.182.008C11.148-.03 9.923.023 8.857 1.18c-1.066 1.156-.902 2.482-.878 2.516s1.52.087 2.475-1.258.762-2.391.728-2.43m3.314 11.733c-.048-.096-2.325-1.234-2.113-3.422s1.675-2.789 1.698-2.854-.597-.79-1.254-1.157a3.7 3.7 0 0 0-1.563-.434c-.108-.003-.483-.095-1.254.116-.508.139-1.653.589-1.968.607-.316.018-1.256-.522-2.267-.665-.647-.125-1.333.131-1.824.328-.49.196-1.422.754-2.074 2.237-.652 1.482-.311 3.83-.067 4.56s.625 1.924 1.273 2.796c.576.984 1.34 1.667 1.659 1.899s1.219.386 1.843.067c.502-.308 1.408-.485 1.766-.472.357.013 1.061.154 1.782.539.571.197 1.111.115 1.652-.105.541-.221 1.324-1.059 2.238-2.758q.52-1.185.473-1.282"/>
+                      </svg></a>
+                </div>
+
+                <div class="btnBigOutline" style="display: none;">
+                    <button id="addToHomeButton" class="aBig">UŽ BRZY!</button>
+                </div>
+
+            </div>
+            <div id="previewImg">
+                <img src="{{ url_for('static', filename='images/preview.png') }}">
+            </div>
+        </div>
+    </div>
+    <div id="mainGridFull">
+        <img style="-webkit-filter: invert(1);filter: invert(1); width: 150px; padding-bottom: 3px;" src="{{ url_for('static', filename='images/OpenAILogo.png') }}">
+        <img style="-webkit-filter: invert(1);filter: invert(1); width: 150px; padding-bottom: 10px;" src="{{ url_for('static', filename='images/RenderLogo.png') }}">
+        <img style="-webkit-filter: invert(1);filter: invert(1); width: 150px; padding-bottom: 2px;" src="{{ url_for('static', filename='images/PythonLogo.jpg') }}">
+        <img style="-webkit-filter: invert(1);filter: invert(1); height: 40px;" src="{{ url_for('static', filename='images/FlaskLogo.png') }}">
+    </div>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-GXT755RYYB"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+
+        gtag('config', 'G-GXT755RYYB');
+    </script>
+    <script type="text/javascript">
+        document.getElementById("addToHomeButton").disabled = true;
+        let deferredPrompt;
+        window.addEventListener('beforeinstallprompt', (event) => {
+            // Prevent Chrome 67 and earlier from automatically showing the prompt
+            event.preventDefault();
+            // Stash the event so it can be triggered later
+            deferredPrompt = event;
+            // Show your custom Add to Home Screen button
+            showAddToHomeScreenButton();
+        });
+        function showAddToHomeScreenButton() {
+            // Display your custom button here
+            const addToHomeButton = document.getElementById('addToHomeButton');
+            //addToHomeButton.style.display = 'block';
+            addToHomeButton.addEventListener('click', () => {
+            // Trigger the deferred prompt
+            deferredPrompt.prompt();
+            // Wait for the user to respond to the prompt
+            deferredPrompt.userChoice.then((choiceResult) => {
+                if (choiceResult.outcome === 'accepted') {
+                console.log('User accepted the A2HS prompt');
+                } else {
+                console.log('User dismissed the A2HS prompt');
+                }
+                // Reset deferredPrompt variable
+                deferredPrompt = null;
+            });
+            });
+        }
+
+        if ('serviceWorker' in navigator) {
+           console.log("Will the service worker register?");
+           navigator.serviceWorker.register("{{ url_for('static', filename='scripts/service-worker.js') }}")
+             .then(function(reg){
+               console.log("Yes, it did.");
+            }).catch(function(err) {
+               console.log("No it didn't. This happened:", err)
+           });
+        }
+       </script>
+</body>
+</html>

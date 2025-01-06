@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="user-scalable=0"/>
+    <meta name="google-site-verification" content="RQaPpbf8SdwiqzUFZg0-9qgYAPf53gtBnWbSz9nxk64" />
+    <title>Photochemistry</title>
+    <link rel="stylesheet" type="text/css" href="static/css/thanks.css">
+    <link rel="icon" href="{{ url_for('static', filename='images/favicon.ico') }}">
+
+</head>
+<body>
+    <div id="mainGrid">
+        <div id="aboutApp">
+            <div id="logo">
+                <div class="elipseTop"></div>
+                    <div class="bottomPart" id="windowHeight">
+                        <div class="flexCenter" id="bottomHead">
+                            <div>
+                                <span id="headlineBig">P</span><span id="headline">HOTO</span><span id="headlineBig">C</span><span id="headline">HEMISTRY</span>
+                            </div>
+                            <div id="controlLine"></div>
+
+                        </div>
+                        
+                        
+                    </div>
+                <div class="elipseBottom"></div>
+            </div>
+            <div id="aboutAppDiv">
+                <span id="bigTxt">DĚKUJEME ZA VAŠI PODPORU!</span>
+                <div id="line" class="flexCenter"></div>
+                <p>Vaše příspěvky nám pomáhají rozvíjet a zlepšovat naši chemickou platformu. Jako projev naší vděčnosti vám poskytujeme následující výhody:</p>
+                <li>⏩ rychlejší načítání ⏩</li>
+                <li>🧪 nalezení reakcí 🧪</li>
+                <li>📺 bez reklam 📺</li>
+            </div>
+            </div>
+        <div>
+            <div id="btnBar">
+                <div class="btnBigOutline">
+                    <button id="addToHomeButton" class="aBig" onclick="paid()">ZPĚT DO APLIKACE</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-GXT755RYYB"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+
+        gtag('config', 'G-GXT755RYYB');
+    </script>
+    <script>
+        window.onload = function() {
+            localStorage.setItem('paid', 'true');
+        }
+        function paid() {
+            localStorage.setItem('paid', 'true');
+            window.location.href = "{{ url_for('index') }}";
+        }
+    </script>
+</body>
+</html>
