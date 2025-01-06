@@ -18,5 +18,5 @@ Tyto soubory obsahují citlivé informace a nejsou sdíleny ve veřejném úlož
 
 Pro použití této aplikace budete muset nahradit zástupné znaky `CENZURA` svými vlastními API klíči a dodat chybějící soubory.
 
-## Středoškolská odborná činnost
-
+## Středoškolská odborná činnost 
+Odkaz na práci: https://1drv.ms/w/s!Ajtcv5NNAjbxgakkQiId-jwo0123Ug?e=56eygH
