@@ -23,5 +23,7 @@ Odkaz na práci: https://1drv.ms/w/s!Ajtcv5NNAjbxgakkQiId-jwo0123Ug?e=56eygH
 
 ## Odkazy
 Odkaz na stránky: https://photochemistry.link/
+
 Odkaz na Obchod Play: https://play.google.com/store/apps/details?id=com.soumenx.photochemistry&pli=1
+
 Odkaz na IOS: https://photochemistry.link/ios
